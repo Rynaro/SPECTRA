@@ -1,0 +1,74 @@
+# Changelog
+
+## [4.2.0] - 2026-03-01 — GitHub Release
+
+### Added
+- **THEORY.md** — PhD-level theoretical foundations:
+  - Expected Value of Perfect Information (EVPI) for confidence gating
+  - Plan Entropy metric for adaptive verification budgets
+  - Cognitive Load Theory formalization (Miller's Law justification for 3–5 hypotheses)
+  - Scoring Calibration Protocol (anchor-based inter-rater reliability)
+  - Failure Taxonomy (8 plan failure modes with diagnostic signals)
+  - Diminishing Returns Detection for refinement cycles (Δ < 0.3 stop criterion)
+  - Bayesian Updating in Pattern Phase
+  - Connections to lightweight formal verification methods
+- Failure taxonomy integrated into scoring.md Test phase
+- Scoring calibration protocol in scoring.md
+- Adaptive verification budget notes in SPECTRA.md Test phase
+- Oscillation detection in SPECTRA.md Refine phase
+
+### Changed
+- `spectra-init.sh` fully rewritten: cleaner detection, better LLM prompt, cross-platform (Linux/macOS/WSL)
+- README reorganized for GitHub: prominent benchmarks banner, usage-purpose file organization, proper repo URLs
+- All `rynaro/spectra-planning` placeholders replaced with `Rynaro/SPECTRA`
+- Repository URLs point to `github.com/Rynaro/SPECTRA`
+- Version bumped to 4.2.0
+
+## [4.1.0] - 2026-03-01
+
+### Added
+- `tools/spectra-init.sh` — Shell script to analyze any project and generate LLM adaptation prompts
+- Generic API feature example (Node.js/TypeScript) alongside Rails example
+- Anti-patterns file with correct alternatives
+- Benchmarks section with designed evaluation framework and "incoming" status
+- PhD-level enhancements: stakeholder mapping (Scope), failure pattern catalog (Pattern), rejected alternative documentation (Explore), risk tags P0/P1/P2 (Construct), refinement oscillation tracking (Refine), cognitive load assessment (CLARIFY)
+- 6-Layer Verification checklist in scoring.md
+- Full 7-dimension hypothesis rubric (1-10 scale with weights) in scoring.md
+- State Machine JSON template in templates.md
+
+### Changed
+- Repository restructured by usage purpose: `docs/`, `tools/`, `examples/`
+- All agent names (company-specific) replaced with generic capability classes
+- Rails-specific patterns acknowledged as origin but made stack-agnostic
+- Examples separated from methodology into own directory
+- SKILL.md reduced to pure routing card (~100 words)
+- Templates updated with rejection documentation, risk tags, state machine format
+- Version bump to distinguish open-source release
+
+### Removed
+- Company-specific agent names (Archie, Dilton, Jughead, Betty, Moose, Hiram, Reggie)
+- EOS Rock references (replaced with generic "Strategic Goal / Quarterly Objective")
+- Rails-specific pattern names from core methodology (FlowObject, Repository, ViewComponent)
+
+## [4.0.0] - 2026-02-18
+
+### Added
+- CLARIFY phase (pre-SPECTRA disambiguation)
+- 6-layer verification (structural → adversarial)
+- Reflexion-style refinement protocol
+- Plan artifact persistence (MD + YAML + JSON)
+- Adaptive replanning with 3-step lookahead
+- Context compaction and anti-drift mechanisms
+- Preflight checklist replacing verbose Boundaries section
+- Research foundation: 15+ papers, commercial analysis, synthesis
+
+### Changed
+- 54% token reduction through architectural separation (SKILL.md as routing card, SPECTRA.md as single source)
+- Confidence bands refined: 50-69% = COLLABORATE, 70-84% = VALIDATE
+- Self-critique protocol upgraded from generic "improve" to Reflexion-style
+
+## [3.1.0] - 2025-01 (Internal)
+
+- Initial SPECTRA methodology with 7-phase cycle
+- Company-specific agent routing
+- Rails-focused examples and patterns
