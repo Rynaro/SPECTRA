@@ -41,7 +41,7 @@ A cognitive architecture that codifies how the best commercial tools think befor
          ┌── CLARIFY (disambiguate + gather context) ──┐
          ▼                                             │
   S → P → E → C → T → R ─┬→ A (confidence ≥85%)        │
-                          └→ R (refine, max 3)         │
+                         └→ R (refine, max 3)          │
          ▼                                             │
          └── PERSIST (artifact storage) + ADAPT ───────┘
 ```
