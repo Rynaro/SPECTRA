@@ -29,7 +29,7 @@ SPECTRA produces plans — never code. Output is always dual-format: human-reada
 1. **Parse Intent** — Extract WHO, WHAT, WHY, CONSTRAINTS.
 2. **Identify Gaps** — What's missing, ambiguous, or assumes unstated context?
 3. **Ask ≤3 Questions** — Numbered, specific, <200 chars each. Focus on decisions that change the plan's shape.
-4. **Gather Structural Context** — Query codebase for existing patterns, dependency structure (imports, call sites), and prior specs from memory.
+4. **Gather Structural Context** — Query codebase for existing patterns, dependency structure (imports, call sites), prior specs from memory, and project conventions (`spectra-conventions.md`, if installed).
 5. **Assess Cognitive Load** — Estimate total reasoning depth required; flag multi-session tasks early.
 6. **Skip** when intent is unambiguous AND constraints explicit AND context sufficient.
 
@@ -62,7 +62,7 @@ SPECTRA produces plans — never code. Output is always dual-format: human-reada
 **Trigger:** After Scope.
 
 1. Query memory: past specs, reflections, architectural patterns.
-2. Query codebase: existing implementations matching intent.
+2. Query codebase: existing implementations matching intent. Include project conventions if available.
 3. Rank by MMR: `similarity - 0.3 × redundancy` (retrieve 15 candidates, select top 5).
 4. Select strategy:
 
@@ -133,7 +133,7 @@ Output: plan artifact at `plans/{date}-{feature}.md`.
 |-------|-------|
 | Structural | Hierarchy intact? Stories independent? No orphaned tasks? |
 | Self-Consistency | 3 alternative decompositions converge? (≥70% overlap = stable) |
-| Dependency | All affected files identified? Call sites covered? Migration paths defined? |
+| Dependency | All affected files identified? Call sites covered? Migration paths defined? File paths validated against actual project structure? |
 | Constraint | NFRs met? Timeboxes realistic? Security/compliance implications addressed? |
 | Process Reward | Does each step reduce risk / increase clarity? Is ordering optimal? |
 | Adversarial | What could go wrong? What did we miss? What would a skeptical reviewer challenge? |
@@ -277,11 +277,20 @@ SPECTRA's design decisions are grounded in decision theory, information theory, 
 
 ---
 
-## Adapting SPECTRA to Your Stack
+## Installing SPECTRA in Your Project
 
-SPECTRA was developed and battle-tested on Ruby on Rails applications, but the methodology is stack-agnostic. The cognitive architecture (how to think about planning) doesn't change — only the domain vocabulary in your stories and action plans does.
+SPECTRA is stack-agnostic. The cognitive architecture doesn't change — only the domain vocabulary in your stories and action plans does. Installation produces a `spectra-conventions.md` that maps SPECTRA's generic concepts to your project's actual patterns.
 
-See `tools/spectra-init.sh` to auto-generate project-specific adaptation prompts, or read `examples/` for worked examples across different stacks.
+**Install once, then plan with the core cycle above — no installation overhead per session.**
+
+| Scenario | How to Install |
+|----------|---------------|
+| **Greenfield** (new project) | Run `spectra-init.sh` → paste the adaptation prompt into any LLM → save as `spectra-conventions.md` |
+| **Brownfield** (existing codebase) | Run `spectra-init.sh` (detects existing conventions and structure) → paste the adaptation prompt into any LLM → save as `spectra-conventions.md`. See [RETROFIT.md](../research/RETROFIT.md) for the full brownfield protocol with progressive depth analysis |
+
+See `tools/spectra-init.sh` for the installer, or `examples/` for worked examples across different stacks.
+
+**What the installer produces:** `spectra-conventions.md` — convention mapping, action verb mapping, validation gates, architectural boundaries. Consumed by CLARIFY (step 4) and Pattern (step 2) as part of normal structural context.
 
 **What changes per stack:** file paths, naming conventions (FlowObject → Service, Repository → DAO), test framework references, deployment patterns.
 
