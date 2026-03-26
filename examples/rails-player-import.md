@@ -131,7 +131,7 @@ metadata:
   confidence: 87
   complexity: 7
   refinement_cycles: 1
-  spectra_version: "4.1.0"
+  spectra_version: "4.2.0"
 
 projects:
   - id: "P-1"

@@ -2,7 +2,7 @@
 
 **A vendor-agnostic planning methodology for AI agents that think before they code.**
 
-[![SPECTRA v4.2](https://img.shields.io/badge/methodology-SPECTRA_v4.2-6366f1)](docs/methodology/SPECTRA.md)
+[![SPECTRA v4.2](https://img.shields.io/badge/methodology-SPECTRA_v4.2-6366f1)](docs/spectra-methodology/SPECTRA.md)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/license-CC_BY--SA_4.0-green)](LICENSE)
 [![Research: 15+ papers](https://img.shields.io/badge/research-15%2B_papers-blue)](docs/research/REFERENCES.md)
 [![Benchmarks: Coming Soon](https://img.shields.io/badge/benchmarks-coming_soon-orange)](docs/benchmarks/README.md)
@@ -73,9 +73,11 @@ A cognitive architecture that codifies how the best commercial tools think befor
 
 ## Quick Start
 
-### Adapt SPECTRA to Your Project
+### Install SPECTRA in Your Project
 
-Run the analyzer at your project root. It detects your stack and generates an LLM prompt to create project-specific conventions:
+SPECTRA installs once per project — it maps the methodology's generic concepts to your codebase's actual patterns, then gets out of the way. The core planning cycle runs clean with no installation overhead per session.
+
+**Step 1: Run the analyzer at your project root**
 
 ```bash
 # Direct run
@@ -88,14 +90,25 @@ bash ../SPECTRA/tools/spectra-init.sh
 ```
 
 This produces two files:
-- **`spectra-project-profile.md`** — Detected languages, frameworks, patterns, directory structure
-- **`spectra-adaptation-prompt.md`** — Paste into any LLM to generate `spectra-conventions.md` for your stack
+- **`spectra-project-profile.md`** — Detected languages, frameworks, patterns, convention files, directory structure
+- **`spectra-adaptation-prompt.md`** — Ready-to-paste LLM prompt
+
+**Step 2: Generate your conventions file**
+
+Paste `spectra-adaptation-prompt.md` into any LLM (Claude, GPT, Gemini, Llama, etc.) and save the output as **`spectra-conventions.md`** in your project root.
+
+**Done.** The SPECTRA planning cycle now uses your conventions automatically as structural context.
+
+| Scenario | What Happens |
+|----------|-------------|
+| **Greenfield** (new project) | `spectra-init.sh` detects your stack. The adaptation prompt creates conventions from framework defaults and best practices. |
+| **Brownfield** (existing codebase) | `spectra-init.sh` detects your stack *and* any existing convention files (`.cursorrules`, `CLAUDE.md`, `AGENTS.md`, etc.). The adaptation prompt creates conventions grounded in your actual codebase. See [RETROFIT.md](docs/research/RETROFIT.md) for the full brownfield protocol. |
 
 ### Read the Methodology
 
 | Start Here | Then | Deep Dives |
 |------------|------|------------|
-| [**SPECTRA.md**](docs/methodology/SPECTRA.md) | [scoring.md](docs/methodology/scoring.md) | [THEORY.md](docs/research/THEORY.md) |
+| [**SPECTRA.md**](docs/spectra-methodology/SPECTRA.md) | [scoring.md](docs/spectra-methodology/scoring.md) | [THEORY.md](docs/research/THEORY.md) |
 | Full cognitive architecture | Rubrics, matrices, validation | Decision theory, information theory, cognitive science |
 
 ---
@@ -107,7 +120,7 @@ Organized by **what you need to do**:
 ```
 SPECTRA/
 │
-├── 📖 docs/methodology/          USE: Learn and apply the methodology
+├── 📖 docs/spectra-methodology/   USE: Learn and apply the methodology
 │   ├── SPECTRA.md                  Core cognitive architecture (start here)
 │   ├── SKILL.md                    Quick-reference routing card
 │   ├── scoring.md                  All rubrics, matrices, validation criteria
@@ -116,7 +129,8 @@ SPECTRA/
 ├── 🔬 docs/research/             USE: Understand the evidence base
 │   ├── REFERENCES.md               15+ papers + commercial tool analysis
 │   ├── SYNTHESIS.md                 Evidence → design decision mapping
-│   └── THEORY.md                   Formal theoretical foundations (PhD-level)
+│   ├── THEORY.md                   Formal theoretical foundations (PhD-level)
+│   └── RETROFIT.md                 Brownfield installation protocol
 │
 ├── 📊 docs/benchmarks/           USE: Evaluate methodology effectiveness
 │   └── README.md                   Evaluation framework + status

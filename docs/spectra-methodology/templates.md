@@ -168,7 +168,7 @@ metadata:
   spec_id: "SPEC-YYYY-MM-DD-XXX"
   confidence: [N]
   complexity: [N]
-  spectra_version: "4.1.0"
+  spectra_version: "4.2.0"
 
 projects:
   - id: "P-1"
@@ -213,7 +213,7 @@ execution_plan:
   "session_id": "uuid",
   "spec_id": "SPEC-YYYY-MM-DD-XXX",
   "goal": "string",
-  "spectra_version": "4.1.0",
+  "spectra_version": "4.2.0",
   "steps": [
     {
       "id": 1,
@@ -231,6 +231,57 @@ execution_plan:
   "completed_steps": [],
   "replanning_history": []
 }
+```
+
+---
+
+## Convention Map (Installation Output)
+
+Generated once during SPECTRA installation (see [RETROFIT.md](../research/RETROFIT.md) for brownfield projects). Saved as `spectra-conventions.md` in the project root. Consumed by CLARIFY and Pattern phases as structural context.
+
+```markdown
+## 🗺️ CONVENTION MAP
+
+**Project:** [name]
+**Generated:** [date]
+**Sources:** [list of convention files found + inference method]
+
+### Quick Reference (Top 5 Conventions)
+1. [Most important convention]
+2. [Second most important]
+3. [Third]
+4. [Fourth]
+5. [Fifth]
+
+### Convention Mapping (SPECTRA → Project)
+| SPECTRA Concept | This Project | Path Pattern | Exemplar |
+|----------------|-------------|--------------|----------|
+| Service / Business Logic | [convention] | [path] | [file] |
+| Data Access | [convention] | [path] | [file] |
+| Validation | [convention] | [path] | [file] |
+| API Endpoint | [convention] | [path] | [file] |
+| Test File | [convention] | [path] | [file] |
+
+### Action Verb Mapping
+| SPECTRA Verb | In This Project | Example |
+|-------------|----------------|---------|
+| Create | [convention] | [example] |
+| Extend | [convention] | [example] |
+| Modify | [convention] | [example] |
+| Test | [convention] | [example] |
+
+### Validation Gates (Default)
+- P0: [critical gate]
+- P1: [test gate]
+- P2: [lint gate]
+
+### Architectural Boundaries
+[project-specific constraints that every SPECTRA spec must respect]
+
+### Sources
+| Convention | Source | Confidence |
+|-----------|--------|------------|
+| [convention] | [file + line or inference method] | HIGH/MEDIUM/LOW |
 ```
 
 ---

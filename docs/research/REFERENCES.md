@@ -26,6 +26,19 @@ Papers, commercial tool analysis, and open-source implementations that inform SP
 | **ReAct** | Yao et al. | ICLR 2023 | Interleaving reasoning traces with tool actions grounds planning in reality | Per-phase THINK → ACT → OBSERVE → REFLECT loop |
 | **Reflexion** | Shinn et al. | NeurIPS 2023 | Verbal self-critique after failures. **91% Pass@1 on HumanEval**. Rich reflections >> "try again" | Refine phase: diagnose → explain → prescribe protocol |
 
+### Repository-Level Code Understanding
+
+| Paper | Authors | Venue | Key Finding | SPECTRA Impact |
+|-------|---------|-------|-------------|----------------|
+| **RepoGraph** | Ouyang et al. | ICLR 2025 | Plug-in code graph module improves existing frameworks by **32.8% avg** across agent and procedural approaches | Convention-aware planning: modular, composable, non-invasive integration |
+| **Code Retrieval in Coding Agents** | Jain | Preprints.org 2025 (pre-print) | Graph-based ranking (Aider) achieves 4.3–6.5% context utilization — high token efficiency; Cline's 3-tier retrieval provides complementary coverage | Structural analysis approach: lightweight, deterministic |
+
+### Convention Files and Developer Context
+
+| Paper | Authors | Venue | Key Finding | SPECTRA Impact |
+|-------|---------|-------|-------------|----------------|
+| **Beyond the Prompt: An Empirical Study of Cursor Rules** | Jiang & Nam | MSR 2026 | 401 repos analyzed; 5 categories: Convention, Guideline, Project, LLM Directive, Example | Taxonomy for convention file ingestion in retrofit protocol |
+
 ### Agent Architectures
 
 | Paper | Authors | Venue | Key Finding | SPECTRA Impact |
@@ -93,6 +106,9 @@ See [THEORY.md](THEORY.md) for formal treatment of how these foundations inform 
 | 50.8% SWE-bench at $0.34/issue | Xia et al. (Agentless) | Validates structured pipeline |
 | 40%+ token waste from wrong assumptions | Commercial analysis | Validates CLARIFY phase |
 | 97% cost reduction with model routing | Cline community | Validates model routing |
+| 32.8% avg improvement with code graph | Ouyang et al. (RepoGraph, ICLR 2025) | Validates modular context enrichment |
+| 5 convention categories in 401 repos | Jiang & Nam (MSR 2026) | Validates convention file taxonomy |
+| 65% of devs report missing context in refactoring | Qodo (2025 State of AI Code Quality, industry survey, N=609) | Validates convention-aware planning |
 
 ---
 

@@ -238,7 +238,51 @@ This is a lightweight Bayesian update that doesn't require mathematical infrastr
 
 ---
 
-## 10. Connections to Formal Methods
+## 10. Convention Files as Entropy Reduction
+
+### The Observation
+
+Convention files — `.cursorrules`, `CLAUDE.md`, `AGENTS.md`, `ARCHITECTURE.md`, ADRs — are a growing pattern across AI-assisted development. An empirical study of 401 repositories with cursor rules (Jiang & Nam, MSR 2026) identified 5 categories that developers encode: Convention, Guideline, Project Information, LLM Directive, and Example.
+
+From SPECTRA's perspective, these files are **entropy-reducing inputs** that directly benefit the planning cycle.
+
+### Formal Framing
+
+Recall from Section 4 that plan entropy measures the uncertainty in the plan's decision space:
+
+$$H(plan) = -\sum_{i=1}^{n} p_i \log_2 p_i$$
+
+Each convention file constrains decisions by eliminating alternatives. If a convention specifies "business logic goes in Service Objects at `app/services/`," then the decision "where to place business logic" has $p = 1$ for one option, contributing 0 bits of entropy. Without the convention, an agent might consider 3–4 equally viable locations, contributing ~2 bits.
+
+**Effect:** Convention files reduce plan entropy by collapsing multi-option decisions into single-option decisions. The aggregate reduction depends on how many planning decisions the conventions cover.
+
+### Implications for Verification
+
+From the adaptive verification budget (Section 4): lower entropy → fewer verification layers needed. A codebase with comprehensive convention files shifts the verification budget downward:
+
+| Without Conventions | With Conventions | Reason |
+|---|---|---|
+| Medium entropy → full 6-layer | Low entropy → 2 layers | Conventions eliminated decision alternatives |
+| More hypotheses needed in Explore | Fewer distinct hypotheses viable | Convention constraints reduce hypothesis space |
+| Higher cognitive load in Construct | Lower cognitive load | Naming, paths, and patterns are pre-decided |
+
+### Installation Depth as EVPI Application
+
+Not all repositories have convention files. Not all convention files are comprehensive. The EVPI framework (Section 3) determines how much analysis to invest during SPECTRA installation:
+
+| Installation Depth | Analysis | One-Time Cost | When Worthwhile |
+|---|---|---|---|
+| **Standard** | `spectra-init.sh` + LLM adaptation prompt | Minutes | Most projects |
+| **Deep** | Exemplar selection + LLM convention extraction + cross-validation | Hours | Large codebases (>500 files), no existing conventions |
+| **Structural** | AST parsing + dependency graphs + importance ranking | Hours | Monorepos, microservices, non-obvious architecture |
+
+The key insight: this analysis cost is paid **once at installation**, not per SPECTRA session. After installation, the convention map is consumed as structural context through the existing CLARIFY and Pattern phases with near-zero marginal cost. This makes even the Deep and Structural tiers cost-effective — they amortize over every subsequent planning session.
+
+See [RETROFIT.md](RETROFIT.md) for the brownfield installation protocol.
+
+---
+
+## 11. Connections to Formal Methods
 
 ### Future Direction: Plan Verification via Lightweight Formal Methods
 

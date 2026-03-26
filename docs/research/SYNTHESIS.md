@@ -55,6 +55,14 @@ Every tool that outperforms a basic ReAct agent implements some version of this.
 **Evidence:** Aider: o1 + DeepSeek = 85%. Cline: R1 + Sonnet = 97% cost reduction. Model leadership changes quarterly.
 **Decision:** Capability classes (reasoning/speed) not vendor names.
 
+### 11. Install Once, Plan Forever
+**Evidence:** MSR '26 Cursor Rules study: 77.6% of repos encode conventions. Qodo 2025: 65% of developers report AI misses context during refactoring. RepoGraph (ICLR 2025): modular context enrichment improves frameworks by 32.8% avg without changing the framework itself.
+**Decision:** Convention extraction is a one-time installation step (via `spectra-init.sh` + LLM), not a per-session cost. The output (`spectra-conventions.md`) is consumed as structural context through the existing CLARIFY and Pattern phases — no special retrofit logic in the core cycle. Convention maps improve Pattern Match quality within the existing scoring architecture (no arbitrary bonuses).
+
+### 12. Brownfield Installation Depth
+**Evidence:** ADaPT (Prasad et al.): attempt first, decompose on failure — don't over-analyze simple problems. EVPI framework (THEORY.md §3): gather information only when cost < expected rework savings.
+**Decision:** Three installation depths for brownfield projects — Standard (init script + LLM), Deep (exemplar analysis + cross-validation), Structural (AST parsing + dependency graphs). Depth choice is made once at installation, not per session. Simple repos use Standard; large/complex repos benefit from Deep or Structural.
+
 ---
 
 ## Research Gaps
@@ -66,6 +74,8 @@ Every tool that outperforms a basic ReAct agent implements some version of this.
 | Self-consistency threshold | 70% overlap | Medium | Cross-project validation |
 | Verification layer ordering | Current sequence | Low | Failure mode frequency data |
 | Context compaction trigger | 80% capacity | Low | Model-dependent tuning |
+| Convention file entropy reduction | Conventions lower plan entropy | Low | Empirical measurement across repos with/without conventions |
+| Optimal convention depth | Progressive tiers mapped to complexity | Low | Case studies comparing Tier 1-only vs full convention analysis |
 
 These gaps are where **community case studies** are most valuable.
 
