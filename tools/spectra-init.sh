@@ -204,8 +204,33 @@ get_project_docs() {
   [[ -f "ARCHITECTURE.md" || -d "docs/adr" ]] && docs="${docs}Architecture docs, "
   [[ -f ".cursorrules" || -d ".cursor/rules" ]] && docs="${docs}Cursor rules, "
   [[ -f "CLAUDE.md" ]] && docs="${docs}Claude config, "
+  [[ -f "AGENTS.md" ]] && docs="${docs}AGENTS.md, "
   [[ -f ".github/copilot-instructions.md" ]] && docs="${docs}Copilot instructions, "
+  [[ -f "spectra-conventions.md" ]] && docs="${docs}SPECTRA conventions, "
   echo "${docs%, }" | sed 's/^$/None/'
+}
+
+get_convention_summary() {
+  local summary=""
+  local convention_files=(.cursorrules CLAUDE.md AGENTS.md .github/copilot-instructions.md ARCHITECTURE.md)
+  for cf in "${convention_files[@]}"; do
+    if [[ -f "$cf" ]]; then
+      local lines
+      lines=$(wc -l < "$cf" 2>/dev/null | tr -d ' ')
+      summary="${summary}- **${cf}** (${lines} lines)\n"
+    fi
+  done
+  if [[ -d ".cursor/rules" ]]; then
+    local count
+    count=$(find .cursor/rules -name "*.mdc" 2>/dev/null | wc -l | tr -d ' ')
+    [[ "$count" -gt 0 ]] && summary="${summary}- **.cursor/rules/** (${count} .mdc files)\n"
+  fi
+  if [[ -d "docs/adr" ]]; then
+    local count
+    count=$(find docs/adr -name "*.md" 2>/dev/null | wc -l | tr -d ' ')
+    [[ "$count" -gt 0 ]] && summary="${summary}- **docs/adr/** (${count} ADRs)\n"
+  fi
+  echo -e "${summary:-None detected}"
 }
 
 get_file_count() {
@@ -232,6 +257,7 @@ echo -e "${BLUE}▸${NC} Scanning structure..."
 DIR_TREE=$(get_dir_tree)
 NAMING_SAMPLES=$(get_naming_samples)
 PROJECT_DOCS=$(get_project_docs)
+CONVENTION_SUMMARY=$(get_convention_summary)
 FILE_COUNT=$(get_file_count)
 echo ""
 echo -e "${GREEN}✓${NC} Detection complete"
@@ -259,6 +285,10 @@ cat > "$PROFILE_OUT" << EOF
 | Architecture | ${ARCH_PATTERNS} |
 | Files | ~${FILE_COUNT} |
 | Existing Docs | ${PROJECT_DOCS} |
+
+## Convention Files Detected
+
+${CONVENTION_SUMMARY}
 
 ## Directory Structure (top 3 levels)
 
