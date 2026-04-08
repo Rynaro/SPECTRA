@@ -73,36 +73,131 @@ A cognitive architecture that codifies how the best commercial tools think befor
 
 ## Quick Start
 
-### Install SPECTRA in Your Project
-
-SPECTRA installs once per project — it maps the methodology's generic concepts to your codebase's actual patterns, then gets out of the way. The core planning cycle runs clean with no installation overhead per session.
-
-**Step 1: Run the analyzer at your project root**
+**One command to install SPECTRA into your project:**
 
 ```bash
-# Direct run
-curl -sL https://raw.githubusercontent.com/Rynaro/SPECTRA/main/tools/spectra-init.sh | bash
-
-# Or clone first
+bash tools/spectra-init.sh
+# or from a clone:
 git clone https://github.com/Rynaro/SPECTRA.git
-cd your-project/
-bash ../SPECTRA/tools/spectra-init.sh
+bash SPECTRA/tools/spectra-init.sh /path/to/your/project
 ```
 
-This produces two files:
-- **`spectra-project-profile.md`** — Detected languages, frameworks, patterns, convention files, directory structure
-- **`spectra-adaptation-prompt.md`** — Ready-to-paste LLM prompt
+The installer will:
+1. **Analyze your project** — detect languages, frameworks, databases, CI systems, existing conventions
+2. **Auto-detect your LLM tool** — Claude Code, GitHub Copilot, or Cursor
+3. **Ask your preference** — **Agent** mode (dedicated `@spectra-planner` agent) or **Skill** mode (on-demand reference). See [SKILL.md](docs/spectra-methodology/SKILL.md) for the difference.
+4. **Install files** — create `.spectra/` working directory + place SPECTRA into your LLM tool
+5. **Generate prompts** — create project profile and adaptation prompt in `.spectra/setup/`
 
-**Step 2: Generate your conventions file**
+The entire flow is **interactive** (2–3 minute setup) and **self-contained** (no manual file copying).
 
-Paste `spectra-adaptation-prompt.md` into any LLM (Claude, GPT, Gemini, Llama, etc.) and save the output as **`spectra-conventions.md`** in your project root.
+**What gets created:**
 
-**Done.** The SPECTRA planning cycle now uses your conventions automatically as structural context.
+```
+.spectra/
+├── plans/                          # Your planning artifacts
+└── setup/
+    ├── project-profile.md          # Detected tech stack
+    ├── adaptation-prompt.md        # Paste this into any LLM
+    └── spectra-conventions.md      # Stub (fill after running prompt)
 
-| Scenario | What Happens |
-|----------|-------------|
-| **Greenfield** (new project) | `spectra-init.sh` detects your stack. The adaptation prompt creates conventions from framework defaults and best practices. |
-| **Brownfield** (existing codebase) | `spectra-init.sh` detects your stack *and* any existing convention files (`.cursorrules`, `CLAUDE.md`, `AGENTS.md`, etc.). The adaptation prompt creates conventions grounded in your actual codebase. See [RETROFIT.md](docs/research/RETROFIT.md) for the full brownfield protocol. |
+.claude/ / .github/ / .cursor/      # Vendor-specific directories
+├── agents/spectra-planner.md       # (if Agent mode)
+└── skills/spectra-methodology/     # (if Skill mode)
+```
+
+**Next step:** Paste `adaptation-prompt.md` into your LLM (Claude, GPT, Gemini, Llama, etc.) to generate conventions tailored to your codebase. Save the output to `spectra-conventions.md`.
+
+**For automation, CI, or advanced usage,** see [Full Installation Guide](#full-installation-guide) below.
+
+---
+
+## Full Installation Guide
+
+### Interactive Mode (Default)
+
+Run the installer and follow the prompts:
+
+```bash
+bash tools/spectra-init.sh
+```
+
+The installer will guide you through:
+
+1. **Project analysis** — Detects your tech stack (languages, frameworks, test suites, CI/CD, architecture patterns, existing convention files)
+2. **Vendor detection** — Identifies installed LLM tools (Claude Code, GitHub Copilot, Cursor) or prompts for manual selection
+3. **Mode selection** — Choose between:
+   - **Agent mode:** SPECTRA as a dedicated `@spectra-planner` agent you invoke explicitly
+   - **Skill mode:** SPECTRA as an on-demand skill/rule loaded automatically by your LLM
+4. **Installation confirmation** — Shows exactly what will be created, then installs files
+
+### Non-Interactive Mode (CI/Automation)
+
+For GitHub Actions, GitLab CI, or other automation, use environment variables:
+
+```bash
+SPECTRA_VENDOR=claude \
+SPECTRA_MODE=skill \
+SPECTRA_YES=1 \
+bash tools/spectra-init.sh /path/to/project
+```
+
+| Variable | Values | Default |
+|----------|--------|---------|
+| `SPECTRA_VENDOR` | `claude`, `copilot`, `cursor` | Auto-detect |
+| `SPECTRA_MODE` | `agent`, `skill` | Prompt user |
+| `SPECTRA_YES` | `1` or unset | Prompt user |
+
+**GitHub Actions example:**
+
+```yaml
+- name: Install SPECTRA
+  env:
+    SPECTRA_VENDOR: claude
+    SPECTRA_MODE: skill
+    SPECTRA_YES: 1
+  run: |
+    bash tools/spectra-init.sh ${{ github.workspace }}
+    git config user.email "spectra@example.com"
+    git config user.name "SPECTRA Installer"
+    git add .spectra/ .claude/
+    git commit -m "chore: Install SPECTRA" || echo "No changes to commit"
+    git push
+```
+
+### File Placement Matrix
+
+| Vendor | Agent Mode | Skill Mode |
+|--------|-----------|-----------|
+| **Claude Code** | `.claude/agents/spectra-planner.md` | `.claude/skills/spectra-methodology/{SKILL.md, SPECTRA.md, resources/}` |
+| **GitHub Copilot** | `.github/agents/spectra-planner.agent.md` | `.github/skills/spectra-methodology/{SKILL.md, SPECTRA.md, resources/}` |
+| **Cursor** | `.cursor/agents/spectra-planner.mdc` | `.cursor/rules/spectra-methodology.mdc` (+ resources/) |
+
+All modes also create:
+- `.spectra/plans/` — for your planning artifacts (YAML, JSON, Markdown)
+- `.spectra/setup/` — project profile, adaptation prompt, conventions stub
+
+**Want to customize the installer or add support for a new vendor/LLM tool?** See [tools/README.md](tools/README.md) for architecture, extensibility, and contribution guide.
+
+### Greenfield vs Brownfield
+
+| Scenario | Installer Behavior |
+|----------|-------------------|
+| **Greenfield** (new project, no conventions) | Detects your tech stack. Adaptation prompt generates conventions from framework defaults and best practices. |
+| **Brownfield** (existing project, has `.cursorrules`, `CLAUDE.md`, etc.) | Detects your stack *and* existing conventions. Adaptation prompt creates new conventions grounded in your codebase. See [RETROFIT.md](docs/research/RETROFIT.md) for the full brownfield protocol. |
+
+---
+
+## After Installation
+
+1. **Review** `.spectra/setup/project-profile.md` — Verify detected languages, frameworks, and patterns are correct
+2. **Generate conventions** — Paste `.spectra/setup/adaptation-prompt.md` into your preferred LLM (Claude, GPT, Gemini, Llama, etc.)
+3. **Save output** — Copy the LLM's response into `.spectra/setup/spectra-conventions.md`
+4. **Start planning** — Use SPECTRA for your next feature. Invoke `@spectra-planner` (Agent mode) or reference the skill (Skill mode)
+
+For a detailed walkthrough of the SPECTRA planning cycle, see [SPECTRA.md](docs/spectra-methodology/SPECTRA.md).
+
+---
 
 ### Read the Methodology
 
