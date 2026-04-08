@@ -20,15 +20,8 @@
 
 set -euo pipefail
 
-# ─── Resolve paths ────────────────────────────────────────────────────────────
+# ─── Resolve SPECTRA_HOME ────────────────────────────────────────────────────
 SPECTRA_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-if [[ $# -ge 1 && -d "$1" ]]; then
-  PROJECT_ROOT="$(cd "$1" && pwd)"
-else
-  PROJECT_ROOT="$(pwd)"
-fi
-PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 
 # ─── Bootstrap: load core first ───────────────────────────────────────────────
 # shellcheck source=lib/core.sh
@@ -38,6 +31,14 @@ require_bash_version 4
 
 # ─── Load all modules ─────────────────────────────────────────────────────────
 source "${SPECTRA_HOME}/lib/config.sh"
+
+# ─── Resolve project paths (after config.sh to avoid overwriting) ────────────
+if [[ $# -ge 1 && -d "$1" ]]; then
+  PROJECT_ROOT="$(cd "$1" && pwd)"
+else
+  PROJECT_ROOT="$(pwd)"
+fi
+PROJECT_NAME="$(basename "$PROJECT_ROOT")"
 source "${SPECTRA_HOME}/lib/tui.sh"
 source "${SPECTRA_HOME}/lib/errors.sh"
 source "${SPECTRA_HOME}/lib/vendor_registry.sh"
