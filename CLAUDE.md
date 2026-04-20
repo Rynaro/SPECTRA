@@ -48,3 +48,18 @@ It outputs `spectra-project-profile.md` and `spectra-adaptation-prompt.md` in th
 ## License
 
 CC BY-SA 4.0 — share improvements under the same terms.
+
+## Consumer Project Usage
+
+After installing SPECTRA into a consumer project via `bash install.sh`, Claude Code
+will find the installed agent at `agents/spectra/agent.md`. Reference it with:
+
+```
+@agents/spectra/agent.md
+```
+
+For direct SPECTRA adoption (project analysis + adaptation prompts), use:
+
+```bash
+bash tools/spectra-init.sh /path/to/project
+```

@@ -1,5 +1,29 @@
 # Changelog
 
+## [Unreleased] — EIIS-1.0 conformance
+
+### Added
+- `AGENTS.md` — root marker with EIIS §5 frontmatter; enables Copilot/Cursor/OpenCode auto-discovery
+- `agent.md` — always-loaded entry point (345 tokens, well within ≤1000 budget)
+- `SPECTRA.md` (root) — EIIS §1 `<EIDOLON>.md` root pointer to `docs/spectra-methodology/SPECTRA.md`
+- `install.sh` — EIIS §2 compliant installer (8 flags: `--target`, `--hosts`, `--force`, `--dry-run`, `--non-interactive`, `--manifest-only`, `--version`, `-h`)
+- `INSTALL.md` — human cross-host install guide covering both EIIS and direct adoption paths
+- `DESIGN-RATIONALE.md` — research-to-decision mapping (8 architectural decisions)
+- `.github/copilot-instructions.md` — Copilot primary entry pointing at `AGENTS.md`
+- `hosts/claude-code.md`, `hosts/copilot.md`, `hosts/cursor.md`, `hosts/opencode.md` — per-host wiring guides
+- `evals/canary-missions.md` — 3 smoke missions (greenfield, brownfield, ambiguous-request)
+- `skills/spectra/SKILL.md` — EIIS-path on-demand skill file (adapted from `docs/spectra-methodology/SKILL.md`)
+- `templates/planning-artifact.md` — EIIS-path template pointer
+- `schemas/install.manifest.v1.json` — JSON Schema draft 2020-12 for `install.manifest.json`
+
+### Changed
+- `CLAUDE.md` — appended "Consumer Project Usage" section with `@agents/spectra/agent.md` pointer
+
+### Notes
+- All existing methodology content in `docs/spectra-methodology/` and `tools/spectra-init.sh` is unchanged
+- EIIS `install.sh` and `tools/spectra-init.sh` serve different purposes; see `INSTALL.md`
+- Audit trail: `.eidolons-audit/`
+
 ## [4.2.0] - 2026-03-01 — GitHub Release
 
 ### Added
