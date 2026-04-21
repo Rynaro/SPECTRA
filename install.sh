@@ -61,14 +61,8 @@ EOF
   esac
 done
 
-# Require bash 4+ (mapfile)
-if (( BASH_VERSINFO[0] < 4 )); then
-  echo "Error: install.sh requires bash 4.0 or later (you have ${BASH_VERSION})." >&2
-  if [[ "$(uname)" == "Darwin" ]]; then
-    echo "  macOS ships bash 3.x. Upgrade via Homebrew: brew install bash" >&2
-  fi
-  exit 1
-fi
+# (Runs under bash 3.2+ — macOS default. `mapfile` below replaced with a
+# while-read loop so Homebrew bash is not a prerequisite.)
 
 readonly EIDOLON_NAME="spectra"
 readonly METHODOLOGY="SPECTRA"
@@ -121,7 +115,10 @@ detect_hosts() {
 }
 
 if [[ "$HOSTS" == "auto" ]]; then
-  mapfile -t _detected < <(detect_hosts)
+  _detected=()
+  while IFS= read -r _line; do
+    [[ -n "$_line" ]] && _detected+=("$_line")
+  done < <(detect_hosts)
   if [[ ${#_detected[@]} -eq 0 ]]; then
     HOSTS="none"
     log_warn "No host environments detected. Methodology files will be installed to ${TARGET}/ only."
