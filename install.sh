@@ -199,6 +199,64 @@ write_file() {
   log_ok "${mode}: ${dst}"
 }
 
+# upsert_eidolon_block <file> <content>
+#
+# Owns a marker-bounded region in a composable dispatch file (CLAUDE.md,
+# AGENTS.md, .github/copilot-instructions.md). Rewrites the body in place
+# when markers already exist; appends a new block otherwise. Cleans up
+# any pre-existing symlink at the target.
+upsert_eidolon_block() {
+  local dst="$1" content="$2"
+  local start="<!-- eidolon:${EIDOLON_NAME} start -->"
+  local end="<!-- eidolon:${EIDOLON_NAME} end -->"
+
+  if [[ "$DRY_RUN" == "true" ]]; then
+    local action="append"
+    [[ -f "$dst" ]] && grep -qF "$start" "$dst" 2>/dev/null && action="rewrite"
+    log_dry "${action} eidolon:${EIDOLON_NAME} block in ${dst}"
+    return
+  fi
+
+  mkdir -p "$(dirname "$dst")" 2>/dev/null || true
+  [[ -L "$dst" ]] && rm -f "$dst"
+
+  local content_file tmp mode
+  content_file="$(mktemp)"
+  printf '%s\n' "$content" > "$content_file"
+
+  if [[ -f "$dst" ]] && grep -qF "$start" "$dst" 2>/dev/null; then
+    mode="rewritten"
+    tmp="$(mktemp)"
+    awk -v start="$start" -v end="$end" -v cf="$content_file" '
+      BEGIN { in_block = 0 }
+      $0 == start {
+        print start
+        while ((getline line < cf) > 0) print line
+        close(cf)
+        in_block = 1
+        next
+      }
+      $0 == end {
+        print end
+        in_block = 0
+        next
+      }
+      !in_block { print }
+    ' "$dst" > "$tmp"
+    mv "$tmp" "$dst"
+  elif [[ -f "$dst" ]]; then
+    mode="appended"
+    { printf '\n%s\n' "$start"; cat "$content_file"; printf '%s\n' "$end"; } >> "$dst"
+  else
+    mode="created"
+    { printf '%s\n' "$start"; cat "$content_file"; printf '%s\n' "$end"; } > "$dst"
+  fi
+
+  rm -f "$content_file"
+  FILES_WRITTEN+=("${dst}|dispatch|${mode}")
+  log_ok "${mode}: ${dst} (eidolon:${EIDOLON_NAME} block)"
+}
+
 echo ""
 echo "Installing SPECTRA v${EIDOLON_VERSION} → ${TARGET}"
 echo "Hosts:  ${HOSTS}"
@@ -222,23 +280,27 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   # --- Per-host dispatch files ---
   IFS=',' read -ra _host_list <<< "$HOSTS"
 
+  # Shared composable block — emitted identically to AGENTS.md, CLAUDE.md,
+  # .github/copilot-instructions.md. Each Eidolon owns its marker-bounded
+  # section within these files.
+  SHARED_BLOCK="## SPECTRA — Decision-ready specifications (v${EIDOLON_VERSION})
+
+Entry:     \`${TARGET_REL}/agent.md\`
+Full spec: \`${TARGET_REL}/SPECTRA.md\`
+Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → Refine → Assemble
+
+**P0 (non-negotiable):** READ-ONLY during all planning phases (no code edits); dual-format output (Markdown + YAML/JSON); CLARIFY first (parse WHO/WHAT/WHY/CONSTRAINTS); confidence ≥85% at Assemble (else Refine, max 3 cycles); output is a specification, never an implementation."
+
+  # AGENTS.md is the host-agnostic open-standard file; emit unconditionally.
+  upsert_eidolon_block "AGENTS.md" "$SHARED_BLOCK"
+
   for _host in "${_host_list[@]}"; do
     _host="${_host// /}"  # trim whitespace
     case "$_host" in
 
       claude-code)
         HOSTS_WIRED+=("claude-code")
-        if [[ -f "CLAUDE.md" ]]; then
-          if ! grep -qE "(\.eidolons|agents)/${EIDOLON_NAME}/agent\.md" "CLAUDE.md" 2>/dev/null; then
-            write_file "CLAUDE.md" "dispatch" "appended" \
-"
-## SPECTRA Planning Agent
-
-\`@${TARGET_REL}/agent.md\`"
-          else
-            log_info "CLAUDE.md already references SPECTRA — skipping"
-          fi
-        fi
+        upsert_eidolon_block "CLAUDE.md" "$SHARED_BLOCK"
 
         # Subagent dispatch — authoritative when claude-code is wired
         if [[ "$DRY_RUN" != "true" ]]; then
@@ -277,28 +339,7 @@ AGENT
 
       copilot)
         HOSTS_WIRED+=("copilot")
-        [[ "$DRY_RUN" != "true" ]] && mkdir -p ".github"
-        if [[ ! -f ".github/copilot-instructions.md" ]]; then
-          write_file ".github/copilot-instructions.md" "dispatch" "created" \
-"# GitHub Copilot — SPECTRA methodology
-
-The SPECTRA planning agent is installed at \`${TARGET}/\`.
-
-- Entry point: \`${TARGET}/agent.md\`
-- Full spec:   \`${TARGET}/SPECTRA.md\`
-- Quick ref:   \`${TARGET}/SKILL.md\`
-
-SPECTRA produces specifications, never code. READ-ONLY during all planning phases."
-        elif ! grep -qE "(\.eidolons|agents)/${EIDOLON_NAME}" ".github/copilot-instructions.md" 2>/dev/null; then
-          write_file ".github/copilot-instructions.md" "dispatch" "appended" \
-"
-## SPECTRA Planning Agent
-
-The SPECTRA planning agent is installed at \`${TARGET}/\`.
-Entry point: \`${TARGET}/agent.md\`"
-        else
-          log_info ".github/copilot-instructions.md already references SPECTRA — skipping"
-        fi
+        upsert_eidolon_block ".github/copilot-instructions.md" "$SHARED_BLOCK"
         ;;
 
       cursor)
