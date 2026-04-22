@@ -19,9 +19,9 @@ The installer creates or appends this file automatically:
 ```markdown
 ## SPECTRA Planning Agent
 
-The SPECTRA planning agent is installed at `agents/spectra/`.
-Entry point: `agents/spectra/agent.md`
-Full spec: `agents/spectra/SPECTRA.md`
+The SPECTRA planning agent is installed at `.eidolons/spectra/`.
+Entry point: `.eidolons/spectra/agent.md`
+Full spec: `.eidolons/spectra/SPECTRA.md`
 ```
 
 **Copilot agent mode** (`.github/agents/`):
@@ -31,7 +31,7 @@ Full spec: `agents/spectra/SPECTRA.md`
 
 **EIIS install creates:**
 ```
-agents/spectra/agent.md
+.eidolons/spectra/agent.md
 .github/copilot-instructions.md   ← created or appended
 ```
 
@@ -40,7 +40,7 @@ agents/spectra/agent.md
 In a GitHub Copilot Chat or Copilot Workspace session:
 
 ```
-Using the SPECTRA methodology at agents/spectra/agent.md, what phases
+Using the SPECTRA methodology at .eidolons/spectra/agent.md, what phases
 should I run for a complex multi-service feature?
 ```
 
@@ -50,7 +50,7 @@ and references the installed files.
 ## 4. Troubleshooting
 
 **Instructions not loading:** Verify `.github/copilot-instructions.md` exists
-and references `agents/spectra/agent.md`. Copilot must have "custom instructions"
+and references `.eidolons/spectra/agent.md`. Copilot must have "custom instructions"
 enabled (Settings → Copilot → Custom Instructions).
 
 **File size limits:** If Copilot truncates the instructions, keep only the

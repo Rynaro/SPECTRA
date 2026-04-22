@@ -11,7 +11,7 @@
 # Usage: bash install.sh [OPTIONS]
 #
 # Options:
-#   --target DIR          Target install dir (default: ./agents/spectra)
+#   --target DIR          Target install dir (default: ./.eidolons/spectra)
 #   --hosts LIST          claude-code,copilot,cursor,opencode,all (default: auto)
 #   --force               Overwrite existing install
 #   --dry-run             Print actions, no writes
@@ -39,7 +39,7 @@ Usage: bash install.sh [OPTIONS]
 Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.0).
 
 Options:
-  --target DIR          Target install dir (default: ./agents/spectra)
+  --target DIR          Target install dir (default: ./.eidolons/spectra)
   --hosts LIST          claude-code,copilot,cursor,opencode,all (default: auto)
   --force               Overwrite existing install
   --dry-run             Print actions, no writes
@@ -50,7 +50,7 @@ Options:
 
 Examples:
   bash install.sh
-  bash install.sh --target ./agents/spectra --hosts claude-code,copilot
+  bash install.sh --target ./.eidolons/spectra --hosts claude-code,copilot
   bash install.sh --dry-run
   bash install.sh --non-interactive --hosts all
 
@@ -74,9 +74,10 @@ readonly SRC_SPECTRA="${SCRIPT_DIR}/docs/spectra-methodology/SPECTRA.md"
 readonly SRC_SKILL="${SCRIPT_DIR}/docs/spectra-methodology/SKILL.md"
 readonly SRC_SCORING="${SCRIPT_DIR}/docs/spectra-methodology/scoring.md"
 readonly SRC_TEMPLATES="${SCRIPT_DIR}/docs/spectra-methodology/templates.md"
+readonly SRC_PLANNING_ARTIFACT="${SCRIPT_DIR}/templates/planning-artifact.md"
 
 # Defaults
-TARGET="./agents/${EIDOLON_NAME}"
+TARGET="./.eidolons/${EIDOLON_NAME}"
 HOSTS="auto"
 FORCE=false
 DRY_RUN=false
@@ -143,7 +144,7 @@ fi
 
 # --- Validate source files ---
 if [[ "$MANIFEST_ONLY" != "true" ]]; then
-  for _f in "$SRC_AGENT" "$SRC_SPECTRA" "$SRC_SKILL" "$SRC_SCORING" "$SRC_TEMPLATES"; do
+  for _f in "$SRC_AGENT" "$SRC_SPECTRA" "$SRC_SKILL" "$SRC_SCORING" "$SRC_TEMPLATES" "$SRC_PLANNING_ARTIFACT"; do
     if [[ ! -f "$_f" ]]; then
       echo "Error: source file not found: ${_f}" >&2
       echo "Run this script from the SPECTRA repo root or a full clone." >&2
@@ -151,6 +152,9 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
     fi
   done
 fi
+
+# Relative form of TARGET for @-pointers (strips leading ./)
+TARGET_REL="${TARGET#./}"
 
 # --- SHA-256 helper ---
 sha256_of() {
@@ -203,16 +207,17 @@ echo ""
 # --- Install methodology files ---
 if [[ "$MANIFEST_ONLY" != "true" ]]; then
   if [[ "$DRY_RUN" != "true" ]]; then
-    mkdir -p "$TARGET"
+    mkdir -p "$TARGET" "${TARGET}/templates"
   else
-    log_dry "mkdir -p ${TARGET}"
+    log_dry "mkdir -p ${TARGET} ${TARGET}/templates"
   fi
 
-  copy_file "$SRC_AGENT"     "${TARGET}/agent.md"     "entry-point"
-  copy_file "$SRC_SPECTRA"   "${TARGET}/SPECTRA.md"   "spec"
-  copy_file "$SRC_SKILL"     "${TARGET}/SKILL.md"     "skill"
-  copy_file "$SRC_SCORING"   "${TARGET}/scoring.md"   "spec"
-  copy_file "$SRC_TEMPLATES" "${TARGET}/templates.md" "template"
+  copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
+  copy_file "$SRC_SPECTRA"           "${TARGET}/SPECTRA.md"                     "spec"
+  copy_file "$SRC_SKILL"             "${TARGET}/SKILL.md"                       "skill"
+  copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "spec"
+  copy_file "$SRC_TEMPLATES"         "${TARGET}/templates.md"                   "template"
+  copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
 
   # --- Per-host dispatch files ---
   IFS=',' read -ra _host_list <<< "$HOSTS"
@@ -224,15 +229,49 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
       claude-code)
         HOSTS_WIRED+=("claude-code")
         if [[ -f "CLAUDE.md" ]]; then
-          if ! grep -q "agents/${EIDOLON_NAME}/agent.md" "CLAUDE.md" 2>/dev/null; then
+          if ! grep -qE "(\.eidolons|agents)/${EIDOLON_NAME}/agent\.md" "CLAUDE.md" 2>/dev/null; then
             write_file "CLAUDE.md" "dispatch" "appended" \
 "
 ## SPECTRA Planning Agent
 
-\`@agents/${EIDOLON_NAME}/agent.md\`"
+\`@${TARGET_REL}/agent.md\`"
           else
-            log_info "CLAUDE.md already references agents/${EIDOLON_NAME}/agent.md — skipping"
+            log_info "CLAUDE.md already references SPECTRA — skipping"
           fi
+        fi
+
+        # Subagent dispatch — authoritative when claude-code is wired
+        if [[ "$DRY_RUN" != "true" ]]; then
+          mkdir -p ".claude/agents"
+          if [[ ! -f ".claude/agents/${EIDOLON_NAME}.md" || "$FORCE" == "true" ]]; then
+            cat > ".claude/agents/${EIDOLON_NAME}.md" <<AGENT
+---
+name: ${EIDOLON_NAME}
+description: "Decision-ready specifications — scoring rubrics, validation gates, GIVEN/WHEN/THEN stories."
+when_to_use: "After ATLAS has mapped the surface (or you have an equivalent brief) and you need a bounded, testable spec before implementation begins."
+tools: Read, Grep, Glob, Write
+methodology: ${METHODOLOGY}
+methodology_version: "${EIDOLON_VERSION%.*}"
+role: Planner — decision-ready specifications
+handoffs: [apivr]
+---
+
+SPECTRA runs the S→P→E→C→T→R→A cycle. Given an exploration or scout
+report, it produces a spec with scoring rubrics, validation gates, and
+structured stories that downstream implementers can act on without
+ambiguity.
+
+See \`${TARGET}/agent.md\` for P0 rules and
+\`${TARGET}/SPECTRA.md\` for the full specification. Skills load on
+demand — see \`${TARGET}/SKILL.md\`.
+AGENT
+            FILES_WRITTEN+=(".claude/agents/${EIDOLON_NAME}.md|dispatch|created")
+            log_ok "Wrote: .claude/agents/${EIDOLON_NAME}.md"
+          else
+            log_info ".claude/agents/${EIDOLON_NAME}.md already exists — use --force to overwrite"
+          fi
+        else
+          log_dry "write: .claude/agents/${EIDOLON_NAME}.md"
         fi
         ;;
 
@@ -250,7 +289,7 @@ The SPECTRA planning agent is installed at \`${TARGET}/\`.
 - Quick ref:   \`${TARGET}/SKILL.md\`
 
 SPECTRA produces specifications, never code. READ-ONLY during all planning phases."
-        elif ! grep -q "agents/${EIDOLON_NAME}" ".github/copilot-instructions.md" 2>/dev/null; then
+        elif ! grep -qE "(\.eidolons|agents)/${EIDOLON_NAME}" ".github/copilot-instructions.md" 2>/dev/null; then
           write_file ".github/copilot-instructions.md" "dispatch" "appended" \
 "
 ## SPECTRA Planning Agent

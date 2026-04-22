@@ -52,10 +52,10 @@ CC BY-SA 4.0 — share improvements under the same terms.
 ## Consumer Project Usage
 
 After installing SPECTRA into a consumer project via `bash install.sh`, Claude Code
-will find the installed agent at `agents/spectra/agent.md`. Reference it with:
+will find the installed agent at `.eidolons/spectra/agent.md`. Reference it with:
 
 ```
-@agents/spectra/agent.md
+@.eidolons/spectra/agent.md
 ```
 
 For direct SPECTRA adoption (project analysis + adaptation prompts), use:

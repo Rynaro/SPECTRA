@@ -20,15 +20,15 @@ The agent file content:
 ```markdown
 # SPECTRA — Planning Specialist
 
-Entry point: `agents/spectra/agent.md`
-Full spec: `agents/spectra/SPECTRA.md`
+Entry point: `.eidolons/spectra/agent.md`
+Full spec: `.eidolons/spectra/SPECTRA.md`
 
 SPECTRA produces specifications, never code. Activate for tasks with complexity ≥7/12.
 ```
 
 **EIIS install creates:**
 ```
-agents/spectra/agent.md
+.eidolons/spectra/agent.md
 .opencode/agents/spectra.md      ← dispatch file (if .opencode/ exists)
 ```
 
@@ -57,6 +57,6 @@ bash install.sh --hosts opencode
 **File not created:** Verify `.opencode/agents/spectra.md` was written.
 Re-run with `--force`: `bash install.sh --hosts opencode --force`.
 
-**Entry point not loading:** Confirm `agents/spectra/agent.md` exists in your
+**Entry point not loading:** Confirm `.eidolons/spectra/agent.md` exists in your
 consumer project. If the EIIS install was run from a different working directory,
-re-run: `bash install.sh --target ./agents/spectra --hosts opencode`.
+re-run: `bash install.sh --target ./.eidolons/spectra --hosts opencode`.
