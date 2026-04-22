@@ -24,11 +24,11 @@ Designed for use with `eidolons-init` and other EIIS-compliant tools.
 ### Quick Install
 
 ```bash
-# Auto-detect consumer hosts, install to ./agents/spectra/
+# Auto-detect consumer hosts, install to ./.eidolons/spectra/
 bash install.sh
 
 # Explicit target and hosts
-bash install.sh --target ./agents/spectra --hosts claude-code,copilot
+bash install.sh --target ./.eidolons/spectra --hosts claude-code,copilot
 
 # Dry run — see what would be created without writing files
 bash install.sh --dry-run
@@ -40,7 +40,7 @@ bash install.sh --non-interactive --hosts all
 ### Options
 
 ```
---target DIR          Install directory (default: ./agents/spectra)
+--target DIR          Install directory (default: ./.eidolons/spectra)
 --hosts LIST          claude-code,copilot,cursor,opencode,all (default: auto)
 --force               Overwrite existing install
 --dry-run             Print actions without writing files
@@ -53,7 +53,7 @@ bash install.sh --non-interactive --hosts all
 ### What gets installed
 
 ```
-agents/spectra/
+.eidolons/spectra/
 ├── agent.md                     ← always-loaded entry point (≤1000 tokens)
 ├── SPECTRA.md                   ← full methodology
 ├── SKILL.md                     ← quick routing card
@@ -62,7 +62,7 @@ agents/spectra/
 └── install.manifest.json        ← EIIS manifest (validated by schemas/install.manifest.v1.json)
 
 # Per-host dispatch files created in consumer project:
-CLAUDE.md                        ← appended: @agents/spectra/agent.md pointer
+CLAUDE.md                        ← appended: @.eidolons/spectra/agent.md pointer
 .github/copilot-instructions.md  ← created or appended
 .cursor/rules/spectra.mdc        ← created (only if .cursor/ exists)
 .opencode/agents/spectra.md      ← created (only if .opencode/ exists)

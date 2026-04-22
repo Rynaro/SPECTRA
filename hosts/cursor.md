@@ -29,8 +29,8 @@ alwaysApply: false
 
 # SPECTRA — Planning Specialist
 
-Entry point: `agents/spectra/agent.md`
-Full spec: `agents/spectra/SPECTRA.md`
+Entry point: `.eidolons/spectra/agent.md`
+Full spec: `.eidolons/spectra/SPECTRA.md`
 
 SPECTRA produces specifications, never code. Activate for tasks with complexity ≥7/12.
 ```

@@ -49,7 +49,7 @@ You are the SPECTRA planning agent. **Produce specifications. Never code.**
 
 ## Consumer Project Usage
 
-After installing with `bash install.sh`, this agent is at `agents/spectra/agent.md`.
+After installing with `bash install.sh`, this agent is at `.eidolons/spectra/agent.md`.
 
 ## Full Specification
 

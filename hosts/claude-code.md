@@ -3,7 +3,7 @@
 ## 1. Install
 
 ```bash
-# EIIS Eidolons framework — installs to ./agents/spectra/
+# EIIS Eidolons framework — installs to ./.eidolons/spectra/
 bash install.sh --hosts claude-code
 
 # Direct SPECTRA adoption — project analysis + adaptation prompts
@@ -18,7 +18,7 @@ The installer appends this pointer automatically:
 ```markdown
 ## SPECTRA Planning Agent
 
-`@agents/spectra/agent.md`
+`@.eidolons/spectra/agent.md`
 ```
 
 **Claude Code agent mode** (direct install):
@@ -33,11 +33,11 @@ The installer appends this pointer automatically:
 
 **EIIS install path:**
 ```
-agents/spectra/agent.md          ← always-loaded entry
-agents/spectra/SPECTRA.md        ← full methodology
-agents/spectra/SKILL.md          ← quick routing card
-agents/spectra/scoring.md        ← rubrics
-agents/spectra/templates.md      ← output formats
+.eidolons/spectra/agent.md          ← always-loaded entry
+.eidolons/spectra/SPECTRA.md        ← full methodology
+.eidolons/spectra/SKILL.md          ← quick routing card
+.eidolons/spectra/scoring.md        ← rubrics
+.eidolons/spectra/templates.md      ← output formats
 ```
 
 ## 3. Verify
@@ -45,7 +45,7 @@ agents/spectra/templates.md      ← output formats
 In Claude Code, run:
 
 ```
-@agents/spectra/agent.md What is your role and what are your hard constraints?
+@.eidolons/spectra/agent.md What is your role and what are your hard constraints?
 ```
 
 Expected: the agent identifies as SPECTRA planning specialist, states the READ-ONLY
@@ -58,13 +58,13 @@ Or for direct install:
 
 ## 4. Troubleshooting
 
-**Agent not found:** Verify `agents/spectra/agent.md` exists. Re-run `bash install.sh --force`.
+**Agent not found:** Verify `.eidolons/spectra/agent.md` exists. Re-run `bash install.sh --force`.
 
-**Wrong file loaded:** Check `CLAUDE.md` contains the `@agents/spectra/agent.md` pointer.
+**Wrong file loaded:** Check `CLAUDE.md` contains the `@.eidolons/spectra/agent.md` pointer.
 The pointer must be in `CLAUDE.md` at the project root, not only in `.claude/`.
 
 **Skill mode not activating:** Confirm SPECTRA files are at `.claude/skills/spectra-methodology/`
-(direct install) or `agents/spectra/` (EIIS install). See `INSTALL.md` for the full path matrix.
+(direct install) or `.eidolons/spectra/` (EIIS install). See `INSTALL.md` for the full path matrix.
 
 **Token budget:** `agent.md` is ≤1000 tokens by design. If Claude Code truncates context,
-load `SPECTRA.md` explicitly: `@agents/spectra/SPECTRA.md`.
+load `SPECTRA.md` explicitly: `@.eidolons/spectra/SPECTRA.md`.
