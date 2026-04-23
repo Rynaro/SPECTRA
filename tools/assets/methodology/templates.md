@@ -237,7 +237,7 @@ execution_plan:
 
 ## Convention Map (Installation Output)
 
-Generated once during SPECTRA installation (see [RETROFIT.md](../research/RETROFIT.md) for brownfield projects). Saved as `spectra-conventions.md` in the project root. Consumed by CLARIFY and Pattern phases as structural context.
+Generated once during SPECTRA installation (see [RETROFIT.md](../research/RETROFIT.md) for brownfield projects). Saved at `.spectra/setup/spectra-conventions.md` in the consumer project — never in the project root, never duplicated into vendor-specific folders. Consumed by CLARIFY (step 4) and Pattern (step 2) as structural context.
 
 ```markdown
 ## 🗺️ CONVENTION MAP
