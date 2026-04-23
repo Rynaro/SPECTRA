@@ -60,13 +60,13 @@ run_main_flow() {
 # ─── Project summary (preview before install) ─────────────────────────────────
 _show_project_summary() {
   tui_summary "Project: ${PROJECT_NAME}" \
-    "Languages"     "${DETECTION_RESULTS[language]:-Unknown}" \
-    "Frameworks"    "${DETECTION_RESULTS[framework]:-Not detected}" \
-    "Tests"         "${DETECTION_RESULTS[test]:-Not detected}" \
-    "Build tools"   "${DETECTION_RESULTS[build]:-Not detected}" \
-    "CI/CD"         "${DETECTION_RESULTS[ci]:-Not detected}" \
-    "Database"      "${DETECTION_RESULTS[database]:-Not detected}" \
-    "Architecture"  "${DETECTION_RESULTS[architecture]:-Not detected}"
+    "Languages"     "${DETECTION_RESULT_LANGUAGE:-Unknown}" \
+    "Frameworks"    "${DETECTION_RESULT_FRAMEWORK:-Not detected}" \
+    "Tests"         "${DETECTION_RESULT_TEST:-Not detected}" \
+    "Build tools"   "${DETECTION_RESULT_BUILD:-Not detected}" \
+    "CI/CD"         "${DETECTION_RESULT_CI:-Not detected}" \
+    "Database"      "${DETECTION_RESULT_DATABASE:-Not detected}" \
+    "Architecture"  "${DETECTION_RESULT_ARCHITECTURE:-Not detected}"
 }
 
 # ─── Installation plan preview ────────────────────────────────────────────────

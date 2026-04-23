@@ -8,8 +8,10 @@
 [[ -n "${_SPECTRA_ERRORS_LOADED:-}" ]] && return 0
 readonly _SPECTRA_ERRORS_LOADED=1
 
-# Track files/dirs created during installation for rollback
-declare -ga _CREATED_PATHS=()
+# Track files/dirs created during installation for rollback. Bash 3.2
+# doesn't support `declare -g`; since this file is sourced at top level
+# (not inside a function), a plain global assignment is enough.
+_CREATED_PATHS=()
 
 track_created() {
   _CREATED_PATHS+=("$1")
