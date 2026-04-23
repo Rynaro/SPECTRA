@@ -9,12 +9,18 @@
 readonly _SPECTRA_SUMMARY_FLOW_LOADED=1
 
 run_summary_flow() {
-  tui_success "SPECTRA installed successfully!"
+  local fit_only="${SPECTRA_FIT_ONLY:-false}"
+
+  if [[ "$fit_only" == "true" ]]; then
+    tui_success "SPECTRA fit complete!"
+  else
+    tui_success "SPECTRA installed successfully!"
+  fi
 
   # ── Files created ──────────────────────────────────────────────────────────
   echo -e "  ${BOLD}Files created:${NC}"
   local entry file desc
-  for entry in "${INSTALLED_FILES[@]}"; do
+  for entry in "${INSTALLED_FILES[@]+"${INSTALLED_FILES[@]}"}"; do
     file="${entry%%|*}"
     desc="${entry##*|}"
     # Make path relative to project root for display
@@ -32,8 +38,14 @@ run_summary_flow() {
   echo -e "    ${CYAN}4.${NC} Start planning your next feature with SPECTRA!"
   echo ""
 
-  # ── Vendor-specific invocation hint ───────────────────────────────────────
-  _show_invocation_hint
+  if [[ "$fit_only" == "true" ]]; then
+    echo -e "  ${DIM}SPECTRA methodology itself is already wired (installed by eidolons).${NC}"
+    echo -e "  ${DIM}This fit pass only produced the .spectra/setup/ artefacts — no vendor files written.${NC}"
+    echo ""
+  else
+    # Vendor-specific invocation hint (full install only)
+    _show_invocation_hint
+  fi
 
   # ── Footer ────────────────────────────────────────────────────────────────
   echo -e "  ${DIM}Learn more: ${SPECTRA_REPO}${NC}"

@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 #
-# eidolons spectra fit — run SPECTRA's RETROFIT tool against the current
-# project, producing .spectra/setup/project-profile.md +
-# adaptation-prompt.md + spectra-conventions.md stub.
+# eidolons spectra fit — produce the project-fit artefacts under
+# .spectra/setup/ (project-profile.md, adaptation-prompt.md,
+# spectra-conventions.md stub). Runs SPECTRA's retrofit tool in
+# --fit-only mode: stack detection + fit artefacts only. NO vendor
+# install is performed — the SPECTRA methodology is already wired
+# through the eidolons flow (.eidolons/spectra/ + .claude/skills/
+# etc.), so re-running vendor_install would be redundant.
 #
 # Invoked by the nexus CLI's generic per-Eidolon dispatcher
 # (eidolons <eidolon> <sub>). cwd is the consumer project root.
@@ -20,6 +24,6 @@ if [[ ! -x "${TOOL_DIR}/spectra-init.sh" ]]; then
   exit 1
 fi
 
-# Hand off to the existing tool. It handles all flags/env vars on its own
-# (SPECTRA_VENDOR, SPECTRA_MODE, SPECTRA_YES, positional project path, etc.)
-exec bash "${TOOL_DIR}/spectra-init.sh" "$@"
+# Hand off to the existing tool in lite (fit-only) mode. Additional
+# flags/env vars (SPECTRA_YES, positional project path) still work.
+exec bash "${TOOL_DIR}/spectra-init.sh" --fit-only "$@"

@@ -15,8 +15,13 @@ readonly _SPECTRA_INSTALLER_LOADED=1
 run_installer() {
   local vendor="$SELECTED_VENDOR"
   local mode="$SELECTED_MODE"
+  local fit_only="${SPECTRA_FIT_ONLY:-false}"
 
-  tui_section "Installing SPECTRA"
+  if [[ "$fit_only" == "true" ]]; then
+    tui_section "Fitting SPECTRA"
+  else
+    tui_section "Installing SPECTRA"
+  fi
 
   check_write_permission "$PROJECT_ROOT"
 
@@ -24,9 +29,20 @@ run_installer() {
   _generate_project_profile
   _generate_adaptation_prompt
   _install_conventions_stub
-  vendor_install "$vendor" "$mode"
 
-  log_ok "Installation complete."
+  # Vendor install only runs in full-install mode. The fit-only path
+  # assumes the SPECTRA methodology is already wired through some other
+  # mechanism (e.g. the eidolons installer) — we only need the project-
+  # fit artefacts under .spectra/setup/.
+  if [[ "$fit_only" != "true" ]]; then
+    vendor_install "$vendor" "$mode"
+  fi
+
+  if [[ "$fit_only" == "true" ]]; then
+    log_ok "Fit complete."
+  else
+    log_ok "Installation complete."
+  fi
 }
 
 # ─── .spectra/ working directory ─────────────────────────────────────────────

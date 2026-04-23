@@ -1,5 +1,15 @@
 # Changelog
 
+## [4.2.7] — fit-only lite mode (skip redundant vendor install)
+
+### Added
+- `--fit-only` flag on `tools/spectra-init.sh` (also accepts `SPECTRA_FIT_ONLY=1` env var). Runs the retrofit in **lite mode**: detect stack → generate `.spectra/setup/project-profile.md`, `adaptation-prompt.md`, `spectra-conventions.md` stub. **Skips vendor selection, mode selection, and vendor methodology install.** The full-install path is unchanged for users running `bash tools/spectra-init.sh` directly.
+- Dedicated fit-plan preview (`_show_fit_only_plan` in `main_flow.sh`) that explains the lite mode and lists only the fit artefacts being created.
+
+### Changed
+- `commands/fit.sh` now invokes the retrofit tool with `--fit-only`. When users run `eidolons spectra fit`, they get the project-fit pass only — no re-install of SPECTRA methodology into `.claude/skills/spectra-methodology/` (which the eidolons flow already handled). Before this change, `eidolons spectra fit` was doing a full install every time, which was redundant and re-wrote vendor files that eidolons owned.
+- Summary banner shows "Fit complete" + a note clarifying that the methodology is wired via eidolons, so the fit pass only emitted `.spectra/setup/` artefacts.
+
 ## [4.2.6] — path discipline + explicit conventions wiring
 
 ### Added
