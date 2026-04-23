@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.2.4] — methodology cleanup + self-contained install + commands/fit.sh
+
+### Added
+- `commands/fit.sh` — per-Eidolon subcommand entry point, invoked by the nexus CLI's generic `eidolons <eidolon> <sub>` dispatcher. Wraps `tools/spectra-init.sh` with a stable interface.
+- Installer now copies `tools/` into `.eidolons/spectra/tools/` so the retrofit toolchain is self-contained at the installed target (no dependency on the source repo being present on disk).
+- Installer now copies `docs/research/*.md` into `.eidolons/spectra/research/` so SPECTRA.md's scholarly citations resolve locally — no WebFetch, no permission prompts during agent activation.
+
+### Changed
+- `install.sh` rewrites `](../research/` → `](./research/` in the copied `SPECTRA.md` so relative citation links resolve against the new local `./research/` directory.
+- `agent.md` Skill Loading table references now point at installed-target-relative paths (`SPECTRA.md`, `skills/planning/SKILL.md`, `research/THEORY.md`) instead of stale source-repo paths.
+
+### Removed
+- `agent.md` "Consumer Project Usage" block (user-onboarding prose the LLM was reading every activation — moved to README/INSTALL concern).
+- `docs/spectra-methodology/SPECTRA.md` "Installing SPECTRA in Your Project" section (same reason — stack adaptation guidance belongs in user-facing docs, not in agent-loaded methodology). A short "Project Conventions (optional)" replaces it with just the LLM-relevant semantics.
+
 ## [Unreleased] — EIIS-1.0 conformance
 
 ### Added

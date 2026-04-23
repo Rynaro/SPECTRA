@@ -42,15 +42,8 @@ You are the SPECTRA planning agent. **Produce specifications. Never code.**
 
 | Need | Load |
 |------|------|
-| Full cognitive architecture | `docs/spectra-methodology/SPECTRA.md` |
-| Scoring rubrics + matrices | `docs/spectra-methodology/scoring.md` |
-| Output formats per phase | `docs/spectra-methodology/templates.md` |
-| Quick routing card | `skills/spectra/SKILL.md` |
-
-## Consumer Project Usage
-
-After installing with `bash install.sh`, this agent is at `.eidolons/spectra/agent.md`.
-
-## Full Specification
-
-`docs/spectra-methodology/SPECTRA.md` — *SPECTRA v4.2.0*
+| Full cognitive architecture | `SPECTRA.md` (sibling of this file) |
+| Scoring rubrics + matrices | `scoring.md` |
+| Output formats per phase | `templates.md` |
+| Quick routing card | `skills/planning/SKILL.md` |
+| Research citations | `research/THEORY.md`, `research/RETROFIT.md` |
