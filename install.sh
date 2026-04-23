@@ -25,7 +25,7 @@
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.2.7"
+readonly EIDOLON_VERSION="4.2.8"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -468,9 +468,16 @@ report, it produces a spec with scoring rubrics, validation gates, and
 structured stories that downstream implementers can act on without
 ambiguity.
 
-See \`${TARGET}/agent.md\` for P0 rules and
-\`${TARGET}/SPECTRA.md\` for the full specification. Skills load on
-demand — see \`${TARGET}/SKILL.md\`.
+## On activation
+
+1. Check for \`.spectra/setup/spectra-conventions.md\` in the current project. If it exists, read it — its project vocabulary (real module names, test framework, deploy targets, naming patterns) supersedes SPECTRA's generic placeholders ("FlowObject", "Repository") throughout the rest of the cycle. If absent, continue with generic defaults; conventions are optional enrichment.
+2. Confirm the output target: every plan, spec, hypothesis, or state file you produce lands under \`.spectra/\` in this project — plans at \`.spectra/plans/\`, state at \`.spectra/state/\`, logs at \`.spectra/logs/\`. Never scatter files outside \`.spectra/\` without an explicit user request; even then, mirror a copy into \`.spectra/plans/\`.
+
+## References
+
+- \`${TARGET}/agent.md\` — P0 rules (read if deeper context is needed)
+- \`${TARGET}/SPECTRA.md\` — full methodology specification
+- \`${TARGET}/skills/planning/SKILL.md\` — progressive-disclosure routing card
 AGENT
             FILES_WRITTEN+=(".claude/agents/${EIDOLON_NAME}.md|dispatch|created")
             log_ok "Wrote: .claude/agents/${EIDOLON_NAME}.md"

@@ -48,4 +48,4 @@ Load `.spectra/setup/spectra-conventions.md` if it exists. When present, its pro
 
 ---
 
-*SPECTRA v4.2.5*
+*SPECTRA v4.2.8*

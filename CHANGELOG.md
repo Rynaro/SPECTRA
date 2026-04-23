@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.2.8] — conventions + path discipline wired into .claude/agents/ subagent
+
+### Changed
+- The `.claude/agents/spectra.md` subagent dispatch (written by `install.sh`) now carries the **conventions-loading hook and output-path discipline inline**. Previously the subagent dispatch was a thin summary that delegated to `.eidolons/spectra/agent.md` — but Claude Code reads the subagent file first and an agent might not eagerly follow the pointer, so SPECTRA sessions could proceed without ever loading `.spectra/setup/spectra-conventions.md`. The subagent now has an explicit "On activation" section telling the agent to (a) read the conventions file if present, (b) confirm all outputs live under `.spectra/`.
+- Skill-load reference in the subagent corrected: was `${TARGET}/SKILL.md`, now `${TARGET}/skills/planning/SKILL.md` — matches the canonical installed layout.
+- Version footer in `skills/planning/SKILL.md` updated to track current patch.
+
 ## [4.2.7] — fit-only lite mode (skip redundant vendor install)
 
 ### Added
