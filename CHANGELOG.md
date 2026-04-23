@@ -1,5 +1,23 @@
 # Changelog
 
+## [4.2.6] — path discipline + explicit conventions wiring
+
+### Added
+- **Output Discipline (P0 — non-negotiable)** section in `SPECTRA.md`. Canonical layout (`setup/`, `plans/`, `state/`, `logs/`) made explicit, with hard rule: every file the agent writes lives under `.spectra/`. No scattering to project root, `docs/`, or arbitrary paths.
+- P0 rule #7 in `agent.md` enforcing the same output-path discipline. The agent-level contract now stops at "produce specifications" _and_ "stay under `.spectra/`".
+- "On Activation" block in `agent.md` + `skills/planning/SKILL.md` instructing the agent to load `.spectra/setup/spectra-conventions.md` at the start of every session if present, fall back to generic defaults otherwise.
+- Preflight checklist in `SPECTRA.md` gains two entries: (a) conventions loaded if present, (b) every output path starts with `.spectra/`.
+
+### Changed
+- CLARIFY step 4 (`SPECTRA.md:32`) now spells out the full conventions path (`.spectra/setup/spectra-conventions.md`), the override semantics ("supersedes generic placeholders"), and the fallback behaviour ("generic defaults"). Previously this was a casual parenthetical.
+- Pattern step 2 (`SPECTRA.md:65`) references the conventions file by its canonical path when ranking codebase matches.
+- CONSTRUCT output path (`SPECTRA.md:122`) changed from `plans/{date}-{feature}.md` → `.spectra/plans/{date}-{feature}.md`.
+- PERSIST diagram (`SPECTRA.md:192-209`) rooted at `.spectra/` with every subdirectory made explicit (setup, plans, state, logs).
+- `docs/spectra-methodology/templates.md` "Convention Map" section fixed — previously said "project root", now correctly says `.spectra/setup/spectra-conventions.md` with a note that it's never duplicated into vendor folders.
+- `docs/research/RETROFIT.md` references to `spectra-conventions.md` now carry the full `.spectra/setup/` path (3 call sites).
+- `examples/anti-patterns.md` plan-path example updated.
+- Synced `tools/assets/methodology/{SPECTRA,SKILL,templates}.md` with the updated sources so the retrofit-tool's vendor installers emit the corrected content into `.claude/skills/`, `.github/instructions/`, `.cursor/rules/`.
+
 ## [4.2.5] — bash 3.2 compatibility for tools/
 
 ### Changed

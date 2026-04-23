@@ -40,7 +40,12 @@ This SKILL.md is the routing card. Escalate on demand:
 4. Complexity ≥7/12 → extended thinking (2× token budget).
 5. Confidence <85% at Assemble → return to Refine (max 3 cycles).
 6. Output is a specification. Execution belongs to a separate agent.
+7. Every output path lives under `.spectra/` — plans at `.spectra/plans/`, state at `.spectra/state/`, logs at `.spectra/logs/`. Never scatter files outside `.spectra/`.
+
+## On activation
+
+Load `.spectra/setup/spectra-conventions.md` if it exists. When present, its project vocabulary (real module names, test framework, deploy targets) supersedes SPECTRA's generic placeholders. When absent, continue with generic defaults — the conventions file is optional enrichment, not a prerequisite.
 
 ---
 
-*SPECTRA v4.2.0*
+*SPECTRA v4.2.5*
