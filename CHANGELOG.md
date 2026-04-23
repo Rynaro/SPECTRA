@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.2.5] — bash 3.2 compatibility for tools/
+
+### Changed
+- `tools/` refactored to run on bash 3.2 (macOS default) instead of requiring bash 4+. `eidolons spectra fit` and `bash tools/spectra-init.sh` now work out of the box on macOS without `brew install bash`.
+- Associative arrays (`declare -gA`) in `detector_registry.sh`, `vendor_registry.sh`, and `detectors/conventions.sh` replaced with ordered-key indexed arrays plus one indirectly-named scalar per key. Public APIs (`register_detector`, `run_detectors`, `register_vendor`, `vendor_install`, `get_convention_summary`, …) unchanged — all internal refactor.
+- `DETECTION_RESULTS` (previously an associative array) is now 8 scalar globals (`DETECTION_RESULT_LANGUAGE`, `DETECTION_RESULT_FRAMEWORK`, …). Consumer sites in `installer.sh` and `flows/main_flow.sh` updated.
+- `declare -g` removed from `errors.sh` — plain globals at module top level are sufficient.
+- `mapfile -t` replaced with `while IFS= read -r` loops in `flows/vendor_flow.sh` (3 call sites).
+- `${var^^}` and `${var,,}` (bash 4 case-conversion operators) replaced with `tr` in `tui.sh` (2 call sites).
+- All array iterations guarded with `"${arr[@]+"${arr[@]}"}"` where the array can legitimately be empty — required for bash 3.2 under `set -u`.
+- `require_bash_version` floor lowered from 4 to 3.2. Signature now accepts `<major> <minor>` (still backwards-compatible — defaults to 3.2).
+
+### Added
+- Shared `_spectra_sanitize_key` helper in `core.sh` for building indirect variable names from arbitrary keys.
+
 ## [4.2.4] — methodology cleanup + self-contained install + commands/fit.sh
 
 ### Added

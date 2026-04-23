@@ -11,7 +11,7 @@
 readonly _SPECTRA_CORE_LOADED=1
 
 # ─── Version ──────────────────────────────────────────────────────────────────
-readonly SPECTRA_VERSION="4.2.0"
+readonly SPECTRA_VERSION="4.2.5"
 readonly SPECTRA_REPO="https://github.com/Rynaro/SPECTRA"
 
 # ─── Colors (with fallback for non-interactive / no-color) ───────────────────
@@ -49,15 +49,15 @@ log_dim()   { echo -e "${DIM}  $*${NC}"; }
 
 # ─── Runtime Checks ───────────────────────────────────────────────────────────
 require_bash_version() {
-  local required_major="${1:-4}"
+  # SPECTRA tools run on bash 3.2+ (macOS default). Caller may request a
+  # higher floor, but 3.2 is the tested minimum.
+  local required_major="${1:-3}"
+  local required_minor="${2:-2}"
   local actual_major="${BASH_VERSINFO[0]}"
-  if (( actual_major < required_major )); then
-    log_error "SPECTRA requires bash ${required_major}.0 or later (you have ${BASH_VERSION})."
-    if [[ "$(uname)" == "Darwin" ]]; then
-      echo -e "  ${DIM}macOS ships bash 3.x. Upgrade via Homebrew: ${BOLD}brew install bash${NC}"
-    else
-      echo -e "  ${DIM}Install bash ${required_major}+ via your package manager.${NC}"
-    fi
+  local actual_minor="${BASH_VERSINFO[1]}"
+  if (( actual_major < required_major )) ||
+     (( actual_major == required_major && actual_minor < required_minor )); then
+    log_error "SPECTRA requires bash ${required_major}.${required_minor} or later (you have ${BASH_VERSION})."
     exit 1
   fi
 }
@@ -95,6 +95,16 @@ trim() {
   s="${s#"${s%%[![:space:]]*}"}"
   s="${s%"${s##*[![:space:]]}"}"
   echo "$s"
+}
+
+# Map an arbitrary key to a bash-legal variable-name suffix.
+# Used by the detector/vendor registries to build indirect variable names
+# for their (associative-array-free) storage. Non-alphanumerics become
+# underscores, making keys like "category:name" or "paths/like/this" safe.
+_spectra_sanitize_key() {
+  local k="$1"
+  k="${k//[^a-zA-Z0-9_]/_}"
+  echo "$k"
 }
 
 # Repeat a character N times

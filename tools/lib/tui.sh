@@ -56,7 +56,9 @@ tui_select() {
 
   # Non-interactive fast-path
   if [[ ! -t 0 || "${SPECTRA_YES}" == "1" ]]; then
-    local env_var="SPECTRA_SELECT_${result_var^^}"
+    # bash 3.2-compatible uppercase (no ${var^^})
+    local _upper; _upper=$(echo "$result_var" | tr '[:lower:]' '[:upper:]')
+    local env_var="SPECTRA_SELECT_${_upper}"
     local env_val="${!env_var:-}"
     if [[ -n "$env_val" ]]; then
       printf -v "$result_var" '%s' "$env_val"
@@ -109,7 +111,9 @@ tui_confirm() {
   answer="${answer:-$default}"
   echo ""
 
-  [[ "${answer,,}" == "y" ]]
+  # bash 3.2-compatible lowercase (no ${var,,})
+  local _lower; _lower=$(echo "$answer" | tr '[:upper:]' '[:lower:]')
+  [[ "$_lower" == "y" ]]
 }
 
 # ─── Spinner ──────────────────────────────────────────────────────────────────

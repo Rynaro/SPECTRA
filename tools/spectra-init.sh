@@ -13,9 +13,9 @@
 #   SPECTRA_VENDOR=claude SPECTRA_MODE=skill SPECTRA_YES=1 bash tools/spectra-init.sh /path/to/project
 #
 # Supported vendors: claude, copilot, cursor
-# Requirements: bash 4+, standard coreutils
+# Requirements: bash 3.2+ (macOS default supported), standard coreutils
 #
-# SPECTRA v4.2.0 — https://github.com/Rynaro/SPECTRA
+# SPECTRA v4.2.5 — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
 
 set -euo pipefail
@@ -27,7 +27,7 @@ SPECTRA_HOME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/core.sh
 source "${SPECTRA_HOME}/lib/core.sh"
 
-require_bash_version 4
+require_bash_version 3 2
 
 # ─── Load all modules ─────────────────────────────────────────────────────────
 source "${SPECTRA_HOME}/lib/config.sh"

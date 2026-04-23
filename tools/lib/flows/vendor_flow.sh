@@ -23,8 +23,11 @@ run_vendor_flow() {
   detect_vendors
   tui_spinner_stop
 
-  local all_vendors
-  mapfile -t all_vendors < <(list_vendors)
+  # bash 3.2-compatible: no mapfile — read line-by-line.
+  local all_vendors=()
+  while IFS= read -r _line; do
+    all_vendors+=("$_line")
+  done < <(list_vendors)
 
   if [[ ${#DETECTED_VENDORS[@]} -eq 0 ]]; then
     _vendor_flow_manual_select "${all_vendors[@]}"
@@ -49,8 +52,11 @@ _vendor_flow_confirm_single() {
   if tui_confirm "Use ${BOLD}${description}${NC} for this installation?"; then
     SELECTED_VENDOR="$detected"
   else
-    local all_vendors
-    mapfile -t all_vendors < <(list_vendors)
+    local all_vendors=()
+    local _line
+    while IFS= read -r _line; do
+      all_vendors+=("$_line")
+    done < <(list_vendors)
     _vendor_flow_manual_select "${all_vendors[@]}"
   fi
 }
@@ -71,8 +77,11 @@ _vendor_flow_multiple_detected() {
   tui_select selection "Which tool should SPECTRA be installed for?" "${options[@]}"
 
   if [[ "$selection" == "Show all supported vendors..."* ]]; then
-    local all_vendors
-    mapfile -t all_vendors < <(list_vendors)
+    local all_vendors=()
+    local _line
+    while IFS= read -r _line; do
+      all_vendors+=("$_line")
+    done < <(list_vendors)
     _vendor_flow_manual_select "${all_vendors[@]}"
     return
   fi

@@ -126,6 +126,6 @@ See `tools/lib/detectors/README.md` for the full contract.
 
 ## Requirements
 
-- bash 4.0+ (macOS ships bash 3.x; upgrade with `brew install bash`)
+- bash 3.2+ (macOS default supported; no Homebrew upgrade required)
 - Standard coreutils: `find`, `grep`, `wc`, `sort`, `head`, `cp`, `mkdir`
 - No external dependencies

@@ -18,7 +18,7 @@ Designed for use with `eidolons-init` and other EIIS-compliant tools.
 
 ### Prerequisites
 
-- bash 4+ (`bash --version`)
+- bash 3.2+ (macOS default is fine)
 - Standard coreutils (`cp`, `mkdir`, `wc`, `date`)
 
 ### Quick Install
@@ -85,7 +85,7 @@ SPECTRA conventions tailored to your codebase.
 
 ### Prerequisites
 
-- bash 4+ (`bash --version`)
+- bash 3.2+ (macOS default is fine)
 - Standard coreutils
 
 ### Quick Install
