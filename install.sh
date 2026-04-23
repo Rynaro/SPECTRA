@@ -71,10 +71,10 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Source files (relative to SCRIPT_DIR)
 readonly SRC_AGENT="${SCRIPT_DIR}/agent.md"
 readonly SRC_SPECTRA="${SCRIPT_DIR}/docs/spectra-methodology/SPECTRA.md"
-readonly SRC_SKILL="${SCRIPT_DIR}/docs/spectra-methodology/SKILL.md"
 readonly SRC_SCORING="${SCRIPT_DIR}/docs/spectra-methodology/scoring.md"
 readonly SRC_TEMPLATES="${SCRIPT_DIR}/docs/spectra-methodology/templates.md"
 readonly SRC_PLANNING_ARTIFACT="${SCRIPT_DIR}/templates/planning-artifact.md"
+readonly SRC_SKILLS_DIR="${SCRIPT_DIR}/skills"
 
 # Defaults
 TARGET="./.eidolons/${EIDOLON_NAME}"
@@ -83,19 +83,22 @@ FORCE=false
 DRY_RUN=false
 NON_INTERACTIVE=false
 MANIFEST_ONLY=false
+SHARED_DISPATCH=false
 
 # --- Argument parsing ---
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --target)           TARGET="$2"; shift 2 ;;
-    --hosts)            HOSTS="$2";  shift 2 ;;
-    --force)            FORCE=true;  shift ;;
-    --dry-run)          DRY_RUN=true; shift ;;
-    --non-interactive)  NON_INTERACTIVE=true; shift ;;
-    --manifest-only)    MANIFEST_ONLY=true; shift ;;
-    --version)          echo "${EIDOLON_VERSION}"; exit 0 ;;
-    -h|--help)          exit 0 ;;
-    *)                  echo "Unknown option: $1" >&2; exit 2 ;;
+    --target)               TARGET="$2"; shift 2 ;;
+    --hosts)                HOSTS="$2";  shift 2 ;;
+    --shared-dispatch)      SHARED_DISPATCH=true; shift ;;
+    --no-shared-dispatch)   SHARED_DISPATCH=false; shift ;;
+    --force)                FORCE=true;  shift ;;
+    --dry-run)              DRY_RUN=true; shift ;;
+    --non-interactive)      NON_INTERACTIVE=true; shift ;;
+    --manifest-only)        MANIFEST_ONLY=true; shift ;;
+    --version)              echo "${EIDOLON_VERSION}"; exit 0 ;;
+    -h|--help)              exit 0 ;;
+    *)                      echo "Unknown option: $1" >&2; exit 2 ;;
   esac
 done
 
@@ -144,13 +147,17 @@ fi
 
 # --- Validate source files ---
 if [[ "$MANIFEST_ONLY" != "true" ]]; then
-  for _f in "$SRC_AGENT" "$SRC_SPECTRA" "$SRC_SKILL" "$SRC_SCORING" "$SRC_TEMPLATES" "$SRC_PLANNING_ARTIFACT"; do
+  for _f in "$SRC_AGENT" "$SRC_SPECTRA" "$SRC_SCORING" "$SRC_TEMPLATES" "$SRC_PLANNING_ARTIFACT"; do
     if [[ ! -f "$_f" ]]; then
       echo "Error: source file not found: ${_f}" >&2
       echo "Run this script from the SPECTRA repo root or a full clone." >&2
       exit 1
     fi
   done
+  if [[ ! -d "$SRC_SKILLS_DIR" ]]; then
+    echo "Error: skills source directory not found: ${SRC_SKILLS_DIR}" >&2
+    exit 1
+  fi
 fi
 
 # Relative form of TARGET for @-pointers (strips leading ./)
@@ -272,17 +279,26 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
 
   copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
   copy_file "$SRC_SPECTRA"           "${TARGET}/SPECTRA.md"                     "spec"
-  copy_file "$SRC_SKILL"             "${TARGET}/SKILL.md"                       "skill"
   copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "spec"
   copy_file "$SRC_TEMPLATES"         "${TARGET}/templates.md"                   "template"
   copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
+
+  # Copy the canonical skills tree (source of truth for per-vendor wiring too)
+  if [[ "$DRY_RUN" != "true" ]]; then
+    mkdir -p "${TARGET}/skills"
+    cp -R "${SRC_SKILLS_DIR}/." "${TARGET}/skills/"
+    log_ok "Wrote: ${TARGET}/skills/"
+    FILES_WRITTEN+=("${TARGET}/skills|skill|created")
+  else
+    log_dry "copy ${SRC_SKILLS_DIR}/ → ${TARGET}/skills/"
+  fi
 
   # --- Per-host dispatch files ---
   IFS=',' read -ra _host_list <<< "$HOSTS"
 
   # Shared composable block — emitted identically to AGENTS.md, CLAUDE.md,
   # .github/copilot-instructions.md. Each Eidolon owns its marker-bounded
-  # section within these files.
+  # section within these files. Gated behind --shared-dispatch (opt-in).
   SHARED_BLOCK="## SPECTRA — Decision-ready specifications (v${EIDOLON_VERSION})
 
 Entry:     \`${TARGET_REL}/agent.md\`
@@ -291,8 +307,83 @@ Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → 
 
 **P0 (non-negotiable):** READ-ONLY during all planning phases (no code edits); dual-format output (Markdown + YAML/JSON); CLARIFY first (parse WHO/WHAT/WHY/CONSTRAINTS); confidence ≥85% at Assemble (else Refine, max 3 cycles); output is a specification, never an implementation."
 
-  # AGENTS.md is the host-agnostic open-standard file; emit unconditionally.
-  upsert_eidolon_block "AGENTS.md" "$SHARED_BLOCK"
+  # --- Per-skill vendor wiring helpers ---
+  strip_frontmatter() {
+    local f="$1"
+    if [[ "$(head -1 "$f")" == "---" ]]; then
+      awk 'NR==1 && /^---$/ {in_fm=1; next}
+           in_fm && /^---$/ {in_fm=0; next}
+           !in_fm {print}' "$f"
+    else
+      cat "$f"
+    fi
+  }
+  extract_fm_field() {
+    awk -v field="$2" '
+      NR==1 && /^---$/ { in_fm=1; next }
+      in_fm && /^---$/ { exit }
+      in_fm { p=index($0, field ":"); if (p==1) { sub("^" field ":[[:space:]]*", ""); print; exit } }
+    ' "$1"
+  }
+  wire_skill() {
+    local src_dir="$1" skill_name="$2"
+    local src_skill="${src_dir}/SKILL.md"
+    [[ -f "$src_skill" ]] || return
+    local description
+    description="$(extract_fm_field "$src_skill" "description")"
+    [[ -z "$description" ]] && description="${skill_name}"
+
+    local host
+    for host in "${_host_list[@]}"; do
+      host="${host// /}"
+      case "$host" in
+        claude-code)
+          local dst_dir=".claude/skills/${skill_name}"
+          if [[ "$DRY_RUN" == "true" ]]; then
+            log_dry "copy ${src_dir}/ → ${dst_dir}/"
+          else
+            rm -rf "$dst_dir"
+            mkdir -p "$dst_dir"
+            cp -R "${src_dir}/." "${dst_dir}/"
+            FILES_WRITTEN+=("${dst_dir}/SKILL.md|skill|created")
+            log_ok "Wrote: ${dst_dir}/"
+          fi
+          ;;
+        copilot)
+          local dst=".github/instructions/${skill_name}.instructions.md"
+          if [[ "$DRY_RUN" == "true" ]]; then
+            log_dry "write ${dst}"
+          else
+            mkdir -p ".github/instructions"
+            { echo "---"; echo "applyTo: \"**\""; echo "description: \"${description}\""; echo "---"; strip_frontmatter "$src_skill"; } > "$dst"
+            FILES_WRITTEN+=("${dst}|skill|created")
+            log_ok "Wrote: ${dst}"
+          fi
+          ;;
+        cursor)
+          local dst=".cursor/rules/${skill_name}.mdc"
+          if [[ "$DRY_RUN" == "true" ]]; then
+            log_dry "write ${dst}"
+          else
+            mkdir -p ".cursor/rules"
+            { echo "---"; echo "description: \"${description}\""; echo "alwaysApply: false"; echo "---"; strip_frontmatter "$src_skill"; } > "$dst"
+            FILES_WRITTEN+=("${dst}|skill|created")
+            log_ok "Wrote: ${dst}"
+          fi
+          ;;
+      esac
+    done
+  }
+
+  # Emit per-skill vendor files for every skill directory.
+  for skill_dir in "${SRC_SKILLS_DIR}"/*/; do
+    [[ -d "$skill_dir" ]] || continue
+    skill_name="$(basename "$skill_dir")"
+    wire_skill "$skill_dir" "${EIDOLON_NAME}-${skill_name}"
+  done
+
+  # AGENTS.md (shared dispatch) — opt-in only.
+  [[ "$SHARED_DISPATCH" == "true" ]] && upsert_eidolon_block "AGENTS.md" "$SHARED_BLOCK"
 
   for _host in "${_host_list[@]}"; do
     _host="${_host// /}"  # trim whitespace
@@ -300,7 +391,7 @@ Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → 
 
       claude-code)
         HOSTS_WIRED+=("claude-code")
-        upsert_eidolon_block "CLAUDE.md" "$SHARED_BLOCK"
+        [[ "$SHARED_DISPATCH" == "true" ]] && upsert_eidolon_block "CLAUDE.md" "$SHARED_BLOCK"
 
         # Subagent dispatch — authoritative when claude-code is wired
         if [[ "$DRY_RUN" != "true" ]]; then
@@ -339,30 +430,18 @@ AGENT
 
       copilot)
         HOSTS_WIRED+=("copilot")
-        upsert_eidolon_block ".github/copilot-instructions.md" "$SHARED_BLOCK"
+        [[ "$SHARED_DISPATCH" == "true" ]] && \
+          upsert_eidolon_block ".github/copilot-instructions.md" "$SHARED_BLOCK"
         ;;
 
       cursor)
         HOSTS_WIRED+=("cursor")
+        # Per-skill .cursor/rules/spectra-<skill>.mdc already emitted by wire_skill.
+        # Drop the legacy methodology-level spectra.mdc on --force.
         if [[ -d ".cursor" || -f ".cursorrules" ]]; then
-          [[ "$DRY_RUN" != "true" ]] && mkdir -p ".cursor/rules"
-          _mdc=".cursor/rules/${EIDOLON_NAME}.mdc"
-          if [[ ! -f "$_mdc" || "$FORCE" == "true" ]]; then
-            write_file "$_mdc" "dispatch" "created" \
-"---
-description: SPECTRA planning methodology
-alwaysApply: false
----
-
-# SPECTRA — Planning Specialist
-
-Entry point: \`${TARGET}/agent.md\`
-Full spec:   \`${TARGET}/SPECTRA.md\`
-
-SPECTRA produces specifications, never code. Activate for tasks with complexity ≥7/12."
-          else
-            log_info ".cursor/rules/${EIDOLON_NAME}.mdc already exists — use --force to overwrite"
-          fi
+          [[ -f ".cursor/rules/${EIDOLON_NAME}.mdc" && "$FORCE" == "true" ]] && \
+            rm -f ".cursor/rules/${EIDOLON_NAME}.mdc"
+          :
         else
           log_warn "cursor host requested but no .cursor/ dir found — skipping dispatch file"
         fi
