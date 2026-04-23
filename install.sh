@@ -25,7 +25,7 @@
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.2.0"
+readonly EIDOLON_VERSION="4.2.4"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -283,6 +283,16 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   copy_file "$SRC_TEMPLATES"         "${TARGET}/templates.md"                   "template"
   copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
 
+  # Rewrite relative research/ links in the installed SPECTRA.md so they
+  # resolve locally (research docs copied below) — `../research/` was valid
+  # from the source-repo `docs/spectra-methodology/` but breaks after copy.
+  if [[ "$DRY_RUN" != "true" && -f "${TARGET}/SPECTRA.md" ]]; then
+    sed_tmp="$(mktemp)"
+    # Portable in-place rewrite: read → transform → write
+    sed 's|](\.\./research/|](./research/|g' "${TARGET}/SPECTRA.md" > "$sed_tmp"
+    mv "$sed_tmp" "${TARGET}/SPECTRA.md"
+  fi
+
   # Copy the canonical skills tree (source of truth for per-vendor wiring too)
   if [[ "$DRY_RUN" != "true" ]]; then
     mkdir -p "${TARGET}/skills"
@@ -291,6 +301,50 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
     FILES_WRITTEN+=("${TARGET}/skills|skill|created")
   else
     log_dry "copy ${SRC_SKILLS_DIR}/ → ${TARGET}/skills/"
+  fi
+
+  # Copy research docs into the installed target so the methodology is
+  # self-contained offline — no WebFetch / permission-gated network calls
+  # to resolve SPECTRA.md's citations.
+  if [[ "$DRY_RUN" != "true" && -d "${SCRIPT_DIR}/docs/research" ]]; then
+    mkdir -p "${TARGET}/research"
+    for _f in "${SCRIPT_DIR}/docs/research"/*.md; do
+      [[ -f "$_f" ]] || continue
+      cp "$_f" "${TARGET}/research/"
+    done
+    log_ok "Wrote: ${TARGET}/research/ (self-contained research citations)"
+    FILES_WRITTEN+=("${TARGET}/research|other|created")
+  else
+    log_dry "copy ${SCRIPT_DIR}/docs/research/*.md → ${TARGET}/research/"
+  fi
+
+  # Copy the retrofit tool tree (tools/) so the installed Eidolon can run
+  # `eidolons spectra fit` without depending on the source repo being
+  # present on disk.
+  if [[ "$DRY_RUN" != "true" && -d "${SCRIPT_DIR}/tools" ]]; then
+    mkdir -p "${TARGET}/tools"
+    cp -R "${SCRIPT_DIR}/tools/." "${TARGET}/tools/"
+    chmod +x "${TARGET}/tools/spectra-init.sh" 2>/dev/null || true
+    log_ok "Wrote: ${TARGET}/tools/ (retrofit tooling)"
+    FILES_WRITTEN+=("${TARGET}/tools|other|created")
+  else
+    log_dry "copy ${SCRIPT_DIR}/tools/ → ${TARGET}/tools/"
+  fi
+
+  # Copy per-Eidolon command scripts — consumed by the nexus CLI's generic
+  # `eidolons <eidolon> <sub>` dispatcher. Each file is a standalone bash
+  # script executed from the consumer project root.
+  if [[ "$DRY_RUN" != "true" && -d "${SCRIPT_DIR}/commands" ]]; then
+    mkdir -p "${TARGET}/commands"
+    for _f in "${SCRIPT_DIR}/commands"/*.sh; do
+      [[ -f "$_f" ]] || continue
+      cp "$_f" "${TARGET}/commands/"
+      chmod +x "${TARGET}/commands/$(basename "$_f")"
+    done
+    log_ok "Wrote: ${TARGET}/commands/ (per-Eidolon subcommands)"
+    FILES_WRITTEN+=("${TARGET}/commands|other|created")
+  else
+    log_dry "copy ${SCRIPT_DIR}/commands/ → ${TARGET}/commands/"
   fi
 
   # --- Per-host dispatch files ---

@@ -275,26 +275,11 @@ Verify before delivering any specification:
 
 SPECTRA's design decisions are grounded in decision theory, information theory, and cognitive science. For the formal treatment — including Expected Value of Information analysis for confidence gating, Shannon entropy-based adaptive verification budgets, Miller's Law justification for the 3–5 hypothesis range, scoring calibration protocols, and a formal failure taxonomy — see [THEORY.md](../research/THEORY.md).
 
----
+## Project Conventions (optional)
 
-## Installing SPECTRA in Your Project
+When installed in a specific project, SPECTRA's CLARIFY (step 4) and Pattern (step 2) phases look for a `.spectra/setup/spectra-conventions.md` file that maps the generic SPECTRA concepts to the project's actual vocabulary — file paths, naming conventions, test framework references, deployment patterns. This file is produced by a one-time in-project fit pass (run from the consumer host via a retrofit tool). If absent, SPECTRA still runs with its generic defaults; if present, its outputs reference the project's actual patterns instead of placeholder names like "FlowObject" / "Repository".
 
-SPECTRA is stack-agnostic. The cognitive architecture doesn't change — only the domain vocabulary in your stories and action plans does. Installation produces a `spectra-conventions.md` that maps SPECTRA's generic concepts to your project's actual patterns.
-
-**Install once, then plan with the core cycle above — no installation overhead per session.**
-
-| Scenario | How to Install |
-|----------|---------------|
-| **Greenfield** (new project) | Run `spectra-init.sh` → paste the adaptation prompt into any LLM → save as `spectra-conventions.md` |
-| **Brownfield** (existing codebase) | Run `spectra-init.sh` (detects existing conventions and structure) → paste the adaptation prompt into any LLM → save as `spectra-conventions.md`. See [RETROFIT.md](../research/RETROFIT.md) for the full brownfield protocol with progressive depth analysis |
-
-See `tools/spectra-init.sh` for the installer, or `examples/` for worked examples across different stacks.
-
-**What the installer produces:** `spectra-conventions.md` — convention mapping, action verb mapping, validation gates, architectural boundaries. Consumed by CLARIFY (step 4) and Pattern (step 2) as part of normal structural context.
-
-**What changes per stack:** file paths, naming conventions (FlowObject → Service, Repository → DAO), test framework references, deployment patterns.
-
-**What never changes:** the SPECTRA cycle, hypothesis diversity, verification layers, confidence gating, artifact persistence.
+The SPECTRA cycle, hypothesis diversity requirement, verification layers, confidence gating, and artifact persistence do not change per project.
 
 ---
 
