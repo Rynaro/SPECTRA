@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-# install.sh — SPECTRA EIIS-1.0 Installer
+# install.sh — SPECTRA EIIS v1.1 Installer
 #
-# Installs SPECTRA into a consumer project following the EIIS v1.0 interface
+# Installs SPECTRA into a consumer project following the EIIS v1.1 interface
 # contract. Writes methodology files to a target directory, creates per-host
-# dispatch files, and emits install.manifest.json.
+# dispatch files (claude-code, copilot, cursor, opencode, codex), and emits
+# install.manifest.json.
 #
 # For the full project-analysis installer (detects tech stack, generates
 # adaptation prompts), see: tools/spectra-init.sh
@@ -12,7 +13,8 @@
 #
 # Options:
 #   --target DIR          Target install dir (default: ./.eidolons/spectra)
-#   --hosts LIST          claude-code,copilot,cursor,opencode,all (default: auto)
+#   --hosts LIST          claude-code,copilot,cursor,opencode,codex,all
+#                         (default: auto)
 #   --force               Overwrite existing install
 #   --dry-run             Print actions, no writes
 #   --non-interactive     No prompts; fail on ambiguity (meta-installer mode)
@@ -20,12 +22,12 @@
 #   --version             Print Eidolon version
 #   -h, --help            Show help
 #
-# SPECTRA v4.2.0 — https://github.com/Rynaro/SPECTRA
+# SPECTRA v4.2.0+ — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.2.8"
+readonly EIDOLON_VERSION="4.2.9"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -36,11 +38,12 @@ for _arg in "$@"; do
       cat <<EOF
 Usage: bash install.sh [OPTIONS]
 
-Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.0).
+Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.1).
 
 Options:
   --target DIR          Target install dir (default: ./.eidolons/spectra)
-  --hosts LIST          claude-code,copilot,cursor,opencode,all (default: auto)
+  --hosts LIST          claude-code,copilot,cursor,opencode,codex,all
+                        (default: auto)
   --force               Overwrite existing install
   --dry-run             Print actions, no writes
   --non-interactive     No prompts; fail on ambiguity (meta-installer mode)
@@ -53,6 +56,7 @@ Examples:
   bash install.sh --target ./.eidolons/spectra --hosts claude-code,copilot
   bash install.sh --dry-run
   bash install.sh --non-interactive --hosts all
+  bash install.sh --hosts codex
 
 For project analysis + adaptation prompts (direct SPECTRA adoption):
   bash tools/spectra-init.sh [/path/to/project]
@@ -115,6 +119,15 @@ detect_hosts() {
   [[ -d ".github" ]]                              && detected+=("copilot")
   [[ -d ".cursor" || -f ".cursorrules" ]]         && detected+=("cursor")
   [[ -d ".opencode" ]]                            && detected+=("opencode")
+  # Codex (EIIS v1.1 §4.5): `.codex/` is the definitive Codex-only signal.
+  # Root `AGENTS.md` without `.github/` and without `.codex/` is treated as
+  # a Codex-only project per the cross-vendor agents.md convention
+  # (https://developers.openai.com/codex/guides/agents-md).
+  if [[ -d ".codex" ]]; then
+    detected+=("codex")
+  elif [[ -f "AGENTS.md" && ! -d ".github" ]]; then
+    detected+=("codex")
+  fi
   printf '%s\n' "${detected[@]+"${detected[@]}"}"
 }
 
@@ -126,12 +139,12 @@ if [[ "$HOSTS" == "auto" ]]; then
   if [[ ${#_detected[@]} -eq 0 ]]; then
     HOSTS="none"
     log_warn "No host environments detected. Methodology files will be installed to ${TARGET}/ only."
-    log_warn "Use --hosts to specify: claude-code,copilot,cursor,opencode,all"
+    log_warn "Use --hosts to specify: claude-code,copilot,cursor,opencode,codex,all"
   else
     HOSTS="$(printf '%s\n' "${_detected[@]}" | paste -sd,)"
   fi
 fi
-[[ "$HOSTS" == "all" ]] && HOSTS="claude-code,copilot,cursor,opencode"
+[[ "$HOSTS" == "all" ]] && HOSTS="claude-code,copilot,cursor,opencode,codex"
 
 # --- Idempotency check ---
 MANIFEST_PATH="${TARGET}/install.manifest.json"
@@ -526,6 +539,60 @@ SPECTRA produces specifications, never code. Activate for tasks with complexity 
           fi
         else
           log_warn "opencode host requested but no .opencode/ dir found — skipping dispatch file"
+        fi
+        ;;
+
+      codex)
+        HOSTS_WIRED+=("codex")
+        # EIIS v1.1 §4.1.0 — root AGENTS.md is co-owned by `copilot` and
+        # `codex`. When codex is wired we MUST own a marker-bounded block
+        # there regardless of --shared-dispatch (it is Codex's primary
+        # instruction surface). Skip if --shared-dispatch already handled
+        # the AGENTS.md write above to avoid a duplicate manifest entry.
+        if [[ "$SHARED_DISPATCH" != "true" ]]; then
+          upsert_eidolon_block "AGENTS.md" "$SHARED_BLOCK"
+        fi
+
+        # EIIS v1.1 §4.5 — single Codex subagent file at .codex/agents/<name>.md.
+        # Frontmatter contract: required `name` + `description`; optional
+        # `tools` / `model`. Body mirrors the .claude/agents/spectra.md
+        # subagent prompt — same conventions hook + path discipline so a
+        # Codex invocation resolves to the same pipeline.
+        # Source: https://developers.openai.com/codex/subagents
+        if [[ "$DRY_RUN" != "true" ]]; then
+          mkdir -p ".codex/agents"
+          if [[ ! -f ".codex/agents/${EIDOLON_NAME}.md" || "$FORCE" == "true" ]]; then
+            cat > ".codex/agents/${EIDOLON_NAME}.md" <<CODEX
+---
+name: ${EIDOLON_NAME}
+description: Decision-ready specifications — scoring rubrics, validation gates, GIVEN/WHEN/THEN stories. Activate after a scout report or ATLAS map when you need a bounded, testable spec before implementation.
+---
+
+# SPECTRA — Codex subagent
+
+SPECTRA runs the S→P→E→C→T→R→A cycle. Given an exploration or scout
+report, it produces a spec with scoring rubrics, validation gates, and
+structured stories that downstream implementers can act on without
+ambiguity.
+
+## On activation
+
+1. Check for \`.spectra/setup/spectra-conventions.md\` in the current project. If it exists, read it — its project vocabulary (real module names, test framework, deploy targets, naming patterns) supersedes SPECTRA's generic placeholders ("FlowObject", "Repository") throughout the rest of the cycle. If absent, continue with generic defaults; conventions are optional enrichment.
+2. Confirm the output target: every plan, spec, hypothesis, or state file you produce lands under \`.spectra/\` in this project — plans at \`.spectra/plans/\`, state at \`.spectra/state/\`, logs at \`.spectra/logs/\`. Never scatter files outside \`.spectra/\` without an explicit user request; even then, mirror a copy into \`.spectra/plans/\`.
+
+## References
+
+- \`${TARGET}/agent.md\` — P0 rules (read if deeper context is needed)
+- \`${TARGET}/SPECTRA.md\` — full methodology specification
+- \`${TARGET}/skills/planning/SKILL.md\` — progressive-disclosure routing card
+CODEX
+            FILES_WRITTEN+=(".codex/agents/${EIDOLON_NAME}.md|dispatch|created")
+            log_ok "Wrote: .codex/agents/${EIDOLON_NAME}.md"
+          else
+            log_info ".codex/agents/${EIDOLON_NAME}.md already exists — use --force to overwrite"
+          fi
+        else
+          log_dry "write: .codex/agents/${EIDOLON_NAME}.md"
         fi
         ;;
 
