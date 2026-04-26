@@ -27,7 +27,7 @@
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.2.9"
+readonly EIDOLON_VERSION="4.2.10"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
