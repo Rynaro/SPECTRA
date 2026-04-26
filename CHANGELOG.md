@@ -1,5 +1,20 @@
 # Changelog
 
+## [4.2.9] — EIIS v1.1 conformance + OpenAI Codex host support
+
+### Added
+- `EIIS_VERSION` file at the repo root declaring `1.1`. Resolves drift D-6 (the v1.0 warn-only signal that Eidolons declare which EIIS minor they target) and lets the EIIS conformance checker run the v1.1 gates including §4.5 (Codex subagent contract) against this repo.
+- `codex` host wiring in `install.sh`. The `--hosts` parser accepts `codex` directly, the `auto` detector adds `codex` when `.codex/` is present (or when root `AGENTS.md` exists without `.github/`, per the cross-vendor agents.md convention), and `--hosts all` now expands to `claude-code,copilot,cursor,opencode,codex`. The `auto` warn message and `--help` output advertise the new option.
+- `.codex/agents/spectra.md` subagent dispatch is written when `codex` is wired. Frontmatter follows OpenAI's Codex subagent contract — required `name: spectra` + `description:` (decision-ready specifications, scoring rubrics, validation gates). Body mirrors the inline `.claude/agents/spectra.md` prompt: same "On activation" hook (read `.spectra/setup/spectra-conventions.md` if present, confirm outputs under `.spectra/`) and the same References block, so a Codex invocation resolves to the same pipeline a Claude Code subagent invocation does.
+- Root `AGENTS.md` is now treated as a `codex`-and-`copilot`-shared surface per EIIS v1.1 §4.1.0. When `codex` is in the host list, `install.sh` upserts the marker-bounded `<!-- eidolon:spectra start --> … <!-- eidolon:spectra end -->` block into root `AGENTS.md` regardless of `--shared-dispatch` (Codex's primary instruction surface). The write is gated against double-emission when both `--shared-dispatch` and `codex` are in play, so the manifest still reports `AGENTS.md` exactly once.
+
+### Changed
+- Installer header comment and `--help` output relabelled "EIIS v1.0" → "EIIS v1.1". Bumped `EIDOLON_VERSION` to `4.2.9`.
+- v1.0-conformant invocations remain conformant: the `codex` pathway is fully optional — `--hosts claude-code,copilot,cursor,opencode` is byte-identical to the v4.2.8 behaviour. EIIS v1.1 §4.5 marks the Codex surface OPTIONAL.
+
+### Compliance
+- EIIS v1.1 conformance check (`bash check.sh /path/to/SPECTRA`) passes all MUSTs at `EIIS_VERSION 1.1`. The pre-patch state passed all MUSTs but emitted a grandfathered D-6 warn (missing `EIIS_VERSION`); the post-patch state clears that warn. Bash 3.2 compatibility preserved; idempotent re-runs produce byte-identical output (only `installed_at` differs). `shellcheck -x -S error install.sh` is clean.
+
 ## [4.2.8] — conventions + path discipline wired into .claude/agents/ subagent
 
 ### Changed
