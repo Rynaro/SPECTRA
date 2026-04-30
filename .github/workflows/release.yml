@@ -1,0 +1,39 @@
+name: Release SPECTRA
+
+# Adopts the eidolons-nexus release-integrity contract by calling the
+# reusable Release Template hosted in Rynaro/eidolons. The template:
+#   1. Validates the SemVer input (without leading v)
+#   2. Validates EIIS conformance against the requested EIIS major.minor
+#   3. Builds release metadata (commit, tree, archive_sha256, manifest_sha256)
+#   4. Creates the v<version> tag
+#   5. Attests the release artifacts (GitHub artifact attestation)
+#   6. Publishes a GitHub Release with checksums and provenance metadata
+#
+# Trigger by running this workflow (workflow_dispatch) on `main` with the
+# next SemVer version, e.g. 4.2.11. The maintainer-provided version drives
+# the v<version> tag created by the reusable template.
+#
+# After the release lands, the nexus maintainer runs the `Roster Intake`
+# workflow in Rynaro/eidolons with eidolon=spectra and version=<X.Y.Z> to
+# publish the release integrity metadata into roster/index.yaml.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: SemVer version without the leading v (e.g. 4.2.11)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+  artifact-metadata: write
+
+jobs:
+  release:
+    uses: Rynaro/eidolons/.github/workflows/eidolon-release-template.yml@main
+    with:
+      version: ${{ inputs.version }}
+      eiis-version: "1.1"

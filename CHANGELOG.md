@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- `.github/workflows/release.yml` — adopts the eidolons-nexus release-integrity contract by calling the reusable `eidolon-release-template.yml` from `Rynaro/eidolons`. Triggered via `workflow_dispatch` with a SemVer input; the template validates EIIS conformance, builds release metadata (commit, tree, `archive_sha256`, optional `manifest_sha256`), creates the `vX.Y.Z` tag, attests release artifacts (GitHub artifact attestation), and publishes a GitHub Release. The nexus maintainer then runs `Roster Intake` to publish per-version release integrity metadata into the roster.
+
 ## [4.2.10] - 2026-04-26 — Re-vendor EIIS v1.1 schema (codex enum)
 
 ### Fixed
