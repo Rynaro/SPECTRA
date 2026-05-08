@@ -46,6 +46,21 @@ This SKILL.md is the routing card. Escalate on demand:
 
 Load `.spectra/setup/spectra-conventions.md` if it exists. When present, its project vocabulary (real module names, test framework, deploy targets) supersedes SPECTRA's generic placeholders. When absent, continue with generic defaults — the conventions file is optional enrichment, not a prerequisite.
 
+## ECL emission (Assemble exit gate)
+
+If `ECL_VERSION` is present in the install root, emit `<payload>.envelope.json` co-located with the Markdown spec at the end of the Assemble phase. The envelope MUST:
+
+1. Validate against `schemas/ecl-envelope.v1.json`.
+2. Have `integrity.method: sha256` and `integrity.value` equal to the sha256 hex digest of the Markdown payload bytes at emit time (same value as `artifact.sha256`).
+3. Have `performative: PROPOSE`, `from.eidolon: spectra`, `to.eidolon: apivr`, `edge_origin: roster`.
+4. Have `artifact.kind: spec` and `artifact.schema_version: "1.0"`.
+
+The Markdown frontmatter MUST validate against `schemas/spec-profile.v1.json` (required fields: `eidolon: spectra`, `kind: spec`, `target_repos`, `stories_count`, `validation_gates_count`).
+
+Use `templates/spec.envelope.json` as the skeleton — fill every `<placeholder>` before emitting.
+
+When `ECL_VERSION` is absent, skip envelope emission entirely. Non-ECL consumers experience zero behaviour change.
+
 ---
 
-*SPECTRA v4.2.8*
+*SPECTRA v4.3.0*

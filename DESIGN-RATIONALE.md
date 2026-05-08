@@ -135,4 +135,29 @@ Full scoring protocol in `docs/spectra-methodology/scoring.md`.
 
 ---
 
-*SPECTRA v4.2.0 — CC BY-SA 4.0*
+## DR-09 — ECL Emission Opt-In
+
+**Decision:** SPECTRA emits an ECL v1.0 envelope alongside the spec when
+`ECL_VERSION` is present in the install root. Emission is opt-in — absent
+`ECL_VERSION`, no envelope is produced and non-ECL consumers experience zero
+behaviour change.
+
+**Why:** The `spectra → apivr` hand-off is the primary implementation-trigger
+edge in the Eidolons pipeline. Without a structured envelope, the receiving
+agent (APIVR-Δ) has no machine-readable provenance — it cannot verify that
+the payload was not tampered with between planning and execution (Agent-in-the-Middle
+class of attacks, ACL 2025). The ECL v1.0 sha256 integrity field (§6.2.2)
+gates AiTM/prompt-infection at the message layer: APIVR-Δ can verify the hex
+digest before acting on the spec. Opt-in posture preserves backwards
+compatibility — installs without `ECL_VERSION` are fully functional, and the
+ATLAS v1.5.0 precedent confirms this model works at scale across the Eidolons
+roster.
+
+**Evidence:** ECL v1.0 §status-of-this-document (opt-in for v1.0); ECL §6.2.2
+(sha256 integrity gate); ACL 2025 Findings — Agent-in-the-Middle Attacks;
+ATLAS v1.5.0 (PR #24 on Rynaro/ATLAS) as canonical adoption pattern; published
+hand-off contract at `eidolons-ecl/contracts/spectra-to-apivr.yaml`.
+
+---
+
+*SPECTRA v4.3.0 — CC BY-SA 4.0*
