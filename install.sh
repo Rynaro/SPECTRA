@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# install.sh — SPECTRA EIIS v1.1 Installer
+# install.sh — SPECTRA EIIS v1.2 Installer
 #
-# Installs SPECTRA into a consumer project following the EIIS v1.1 interface
+# Installs SPECTRA into a consumer project following the EIIS v1.2 interface
 # contract. Writes methodology files to a target directory, creates per-host
 # dispatch files (claude-code, copilot, cursor, opencode, codex), and emits
 # install.manifest.json.
@@ -22,12 +22,12 @@
 #   --version             Print Eidolon version
 #   -h, --help            Show help
 #
-# SPECTRA v4.2.0+ — https://github.com/Rynaro/SPECTRA
+# SPECTRA v4.3.0+ — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.2.11"
+readonly EIDOLON_VERSION="4.3.0"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -38,7 +38,7 @@ for _arg in "$@"; do
       cat <<EOF
 Usage: bash install.sh [OPTIONS]
 
-Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.1).
+Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.2).
 
 Options:
   --target DIR          Target install dir (default: ./.eidolons/spectra)
@@ -72,6 +72,12 @@ readonly EIDOLON_NAME="spectra"
 readonly METHODOLOGY="SPECTRA"
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# ECL version emitted by this Eidolon — tolerate absence for older tarballs.
+ECL_VERSION_EMITTED=""
+if [[ -f "${SCRIPT_DIR}/ECL_VERSION" ]]; then
+  ECL_VERSION_EMITTED="$(head -1 "${SCRIPT_DIR}/ECL_VERSION" | tr -d '[:space:]')"
+fi
+
 # Source files (relative to SCRIPT_DIR)
 readonly SRC_AGENT="${SCRIPT_DIR}/agent.md"
 readonly SRC_SPECTRA="${SCRIPT_DIR}/docs/spectra-methodology/SPECTRA.md"
@@ -79,6 +85,10 @@ readonly SRC_SCORING="${SCRIPT_DIR}/docs/spectra-methodology/scoring.md"
 readonly SRC_TEMPLATES="${SCRIPT_DIR}/docs/spectra-methodology/templates.md"
 readonly SRC_PLANNING_ARTIFACT="${SCRIPT_DIR}/templates/planning-artifact.md"
 readonly SRC_SKILLS_DIR="${SCRIPT_DIR}/skills"
+readonly SRC_ECL_VERSION="${SCRIPT_DIR}/ECL_VERSION"
+readonly SRC_SPEC_PROFILE="${SCRIPT_DIR}/schemas/spec-profile.v1.json"
+readonly SRC_ECL_ENVELOPE="${SCRIPT_DIR}/schemas/ecl-envelope.v1.json"
+readonly SRC_SPEC_ENVELOPE_TMPL="${SCRIPT_DIR}/templates/spec.envelope.json"
 
 # Defaults
 TARGET="./.eidolons/${EIDOLON_NAME}"
@@ -285,9 +295,9 @@ echo ""
 # --- Install methodology files ---
 if [[ "$MANIFEST_ONLY" != "true" ]]; then
   if [[ "$DRY_RUN" != "true" ]]; then
-    mkdir -p "$TARGET" "${TARGET}/templates"
+    mkdir -p "$TARGET" "${TARGET}/templates" "${TARGET}/schemas"
   else
-    log_dry "mkdir -p ${TARGET} ${TARGET}/templates"
+    log_dry "mkdir -p ${TARGET} ${TARGET}/templates ${TARGET}/schemas"
   fi
 
   copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
@@ -295,6 +305,14 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "spec"
   copy_file "$SRC_TEMPLATES"         "${TARGET}/templates.md"                   "template"
   copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
+
+  # ECL v1.0 emission files (opt-in — only present when ECL_VERSION exists)
+  if [[ -f "$SRC_ECL_VERSION" ]]; then
+    copy_file "$SRC_ECL_VERSION"          "${TARGET}/ECL_VERSION"                          "other"
+    copy_file "$SRC_SPEC_PROFILE"         "${TARGET}/schemas/spec-profile.v1.json"         "other"
+    copy_file "$SRC_ECL_ENVELOPE"         "${TARGET}/schemas/ecl-envelope.v1.json"         "other"
+    copy_file "$SRC_SPEC_ENVELOPE_TMPL"   "${TARGET}/templates/spec.envelope.json"         "template"
+  fi
 
   # Rewrite relative research/ links in the installed SPECTRA.md so they
   # resolve locally (research docs copied below) — `../research/` was valid
@@ -649,6 +667,7 @@ if [[ "$DRY_RUN" != "true" ]]; then
   "methodology": "${METHODOLOGY}",
   "installed_at": "${_installed_at}",
   "target": "${TARGET}",
+  "ecl_version_emitted": "${ECL_VERSION_EMITTED:-}",
   "hosts_wired": ${_hosts_json},
   "files_written": ${_files_json},
   "handoffs_declared": {

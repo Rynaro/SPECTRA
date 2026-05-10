@@ -5,6 +5,35 @@
 ### Added
 - `.github/workflows/release.yml` — adopts the eidolons-nexus release-integrity contract by calling the reusable `eidolon-release-template.yml` from `Rynaro/eidolons`. Triggered via `workflow_dispatch` with a SemVer input; the template validates EIIS conformance, builds release metadata (commit, tree, `archive_sha256`, optional `manifest_sha256`), creates the `vX.Y.Z` tag, attests release artifacts (GitHub artifact attestation), and publishes a GitHub Release. The nexus maintainer then runs `Roster Intake` to publish per-version release integrity metadata into the roster.
 
+## [4.3.0] — 2026-05-08
+
+### Added
+- `ECL_VERSION` — single-line file (`1.0`) declaring the ECL spec version this Eidolon emits. Read by `install.sh` at install time and propagated into `install.manifest.json` as `ecl_version_emitted`. Presence gates all envelope emission (opt-in posture: no `ECL_VERSION` → no envelope, no behaviour change for non-ECL consumers).
+- `schemas/ecl-envelope.v1.json` — vendored ECL v1.0 envelope schema with the `performative.v1.json#/$defs/performative` cross-file `$ref` inlined as the explicit ten-value enum at both call sites. Self-contained; `jq empty schemas/*.json` passes without fetching neighbour files.
+- `schemas/spec-profile.v1.json` — vendored ECL per-Eidolon profile schema for SPECTRA's `spec` artefact kind. The `_base-profile.v1.json` `allOf` is inlined (base `required` keys and `properties` merged into a single `type: object`); `eidolon` constrained to `spectra`, `kind` constrained to `spec`.
+- `templates/spec.envelope.json` — concrete envelope skeleton with SPECTRA-specific fields hard-coded (`from.eidolon: spectra`, `to.eidolon: apivr`, `performative: PROPOSE`, `edge_origin: roster`, `artifact.kind: spec`, `integrity.method: sha256`). UUIDs and sha256 left as `<placeholder>` for the emitting agent to fill at runtime.
+- **Assemble-phase ECL emission step** — `docs/spectra-methodology/SPECTRA.md` Assemble deliverable #4 and `skills/planning/SKILL.md` ECL emission exit gate. When `ECL_VERSION` is present, the emitter MUST produce `<payload>.envelope.json` co-located with the Markdown spec, with `integrity.value` = sha256 of the Markdown payload bytes at emit time.
+- `comm.envelope_version: "1.0"` YAML frontmatter key added to `agent.md` and `AGENTS.md`.
+- **§ECL Compatibility** section in `docs/spectra-methodology/SPECTRA.md` (between Theoretical Foundations and Project Conventions) — declares ECL version, schema paths, hand-off contract, required spec sections, opt-in posture, and known follow-ups.
+- **DR-09** in `DESIGN-RATIONALE.md` — ECL emission opt-in; opt-in posture rationale; sha256 integrity gate for AiTM/prompt-infection defence (ECL §6.2.2; ACL 2025 Findings — Agent-in-the-Middle Attacks); ATLAS v1.5.0 precedent.
+- **§ECL Envelope Sidecar** subsection in `templates/planning-artifact.md` — file location, required fields table, sha256 anchor contract, when emitted, pointer to `templates/spec.envelope.json`.
+
+### Changed
+- `EIDOLON_VERSION` bumped `4.2.11` → `4.3.0` in `install.sh`. Minor bump (not patch) because ECL emission adds net-new artefacts alongside the existing dual-format output — additive, non-breaking, mirrors the ATLAS v1.4.2 → v1.5.0 minor bump precedent.
+- `install.sh` manifest heredoc gains top-level `ecl_version_emitted` key (populated from `ECL_VERSION` content; defaults to empty string when `ECL_VERSION` absent).
+- `install.sh` now creates `${TARGET}/schemas/` directory and copies `ECL_VERSION`, `schemas/spec-profile.v1.json`, `schemas/ecl-envelope.v1.json`, `templates/spec.envelope.json` when `ECL_VERSION` is present in the source tree. Copy calls use the existing `copy_file` helper; Bash 3.2 compatible.
+- `EIIS_VERSION` bumped `1.1` → `1.2`. EIIS v1.2 GA'd 2026-05-08 alongside ECL v1.0; bumping in the same PR keeps the EIIS conformance gate aligned with the declared version.
+- `.github/workflows/release.yml` `eiis-version` input bumped `"1.1"` → `"1.2"` to match `EIIS_VERSION`.
+- `skills/planning/SKILL.md` version footer `*SPECTRA v4.2.8*` → `*SPECTRA v4.3.0*`.
+
+### Compliance
+- `jq empty schemas/*.json` — clean across all three schemas (`install.manifest.v1.json`, `ecl-envelope.v1.json`, `spec-profile.v1.json`). No cross-file `$ref`s remain in the vendored schemas.
+- `shellcheck -x -S error install.sh` — clean. No new bash 4+ features introduced; `ECL_VERSION_EMITTED` read uses `head -1 | tr -d '[:space:]'`; copy block guarded by `[[ -f ... ]]`. Bash 3.2 floor preserved.
+- Idempotent re-runs: two consecutive `bash install.sh --target /tmp/spectra-X --hosts claude-code --force` runs produce byte-identical manifests except `installed_at`; written files are sha256-stable.
+
+### Known follow-ups
+- The `apivr → spectra-via-vigil` systemic-replan round-trip (`spectra@PROPOSE → apivr@ACKNOWLEDGE → apivr@ESCALATE → vigil@INFORM → spectra@REQUEST(replan)`) has no published contract in `eidolons-ecl/contracts/` yet. Resolution: a later PR on `eidolons-ecl` adding the missing contract first, then on SPECTRA referencing it.
+
 ## [4.2.11] — 2026-05-04
 
 ### Fixed
