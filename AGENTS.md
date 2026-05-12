@@ -3,7 +3,7 @@ name: spectra
 version: 4.3.0
 methodology: SPECTRA
 methodology_version: 4.3.0
-comm.envelope_version: "1.0"
+comm.envelope_version: "1.2"
 role: planning-specialist — transforms ambiguous intent into executable specifications
 handoffs:
   upstream:   []

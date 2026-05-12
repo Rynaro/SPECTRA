@@ -2,7 +2,25 @@
 
 ## [Unreleased]
 
-### Added
+## [4.3.1] — 2026-05-12 — Declare ECL v1.2 conformance
+
+### Changed
+- `ECL_VERSION` file: `1.0` → `1.2`. Targets the latest ECL spec
+  (`Rynaro/eidolons-ecl@v1.2.0`); SPECTRA's emit envelopes remain
+  byte-compatible (v1.2 is backward-compatible with v1.0 per ECL §1.1.1).
+- `agent.md` + `AGENTS.md` frontmatter: `comm.envelope_version`
+  `"1.0"` → `"1.2"`.
+- `install.sh`: `EIDOLON_VERSION` `4.3.0` → `4.3.1` (PATCH bump —
+  declaration-only change; no behaviour change).
+
+### Notes
+- No envelope-format changes. v1.0 envelopes already emitted by older
+  SPECTRA releases are valid under v1.2 conformance.
+- HMAC-SHA-256 RECOMMENDED at `trust_level=high` per ECL v1.1 (gate
+  I-5). SPECTRA's emit edge (spectra → apivr) uses `trust_level=standard`
+  per `contracts/spectra-to-apivr.yaml`; no change required.
+
+### Added (carried over from previous [Unreleased] entry)
 - `.github/workflows/release.yml` — adopts the eidolons-nexus release-integrity contract by calling the reusable `eidolon-release-template.yml` from `Rynaro/eidolons`. Triggered via `workflow_dispatch` with a SemVer input; the template validates EIIS conformance, builds release metadata (commit, tree, `archive_sha256`, optional `manifest_sha256`), creates the `vX.Y.Z` tag, attests release artifacts (GitHub artifact attestation), and publishes a GitHub Release. The nexus maintainer then runs `Roster Intake` to publish per-version release integrity metadata into the roster.
 
 ## [4.3.0] — 2026-05-08
