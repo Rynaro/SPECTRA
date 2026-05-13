@@ -2,6 +2,31 @@
 
 ## [Unreleased]
 
+## [4.3.2] — 2026-05-13 — declare ECL v2.0 conformance
+
+### Changed
+- `ECL_VERSION` file: `1.2` → `2.0`. Targets ECL v2.0
+  (`Rynaro/eidolons-ecl@v2.0.0`; spec `spec/ecl-2.0.md` introducing ISE
+  trust hierarchy). SPECTRA's emit envelopes remain byte-compatible
+  (backward-compatible per ECL §7.3 — 12-month compatibility window
+  through 2027-05-13).
+- `agent.md` + `AGENTS.md` frontmatter: `comm.envelope_version`
+  `"1.2"` → `"2.0"`.
+- `install.sh`: `EIDOLON_VERSION` `4.3.1` → `4.3.2` (PATCH bump —
+  declaration-only change; no behaviour change, no schema change, no
+  envelope-shape change).
+
+### Notes
+- Declaration-only patch bump; no behaviour change, no schema change,
+  no envelope-shape change.
+- SPECTRA emit envelopes remain byte-compatible with ECL v2.0
+  (backward-compatible per ECL §7.3 — 12-month compatibility window
+  through 2027-05-13).
+- Companion patches: ATLAS already merged as v1.5.2; APIVR-Δ, IDG,
+  FORGE, VIGIL follow. All six Eidolons need the bump per ECL v2.0.0
+  publication.
+- Refs: `Rynaro/eidolons-ecl@v2.0.0`.
+
 ## [4.3.1] — 2026-05-12 — Declare ECL v1.2 conformance
 
 ### Changed
