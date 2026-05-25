@@ -302,7 +302,7 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
 
   copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
   copy_file "$SRC_SPEC"              "${TARGET}/SPEC.md"                        "spec"
-  copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "spec"
+  copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "other"
   copy_file "$SRC_TEMPLATES"         "${TARGET}/templates.md"                   "template"
   copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
 
@@ -663,6 +663,11 @@ if [[ "$DRY_RUN" != "true" ]]; then
 
   _installed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "1970-01-01T00:00:00Z")
 
+  # Canonical spec_file path (EIIS v1.3 §1.8) — schema pattern: ^\.eidolons/[a-z][a-z0-9-]*/SPEC\.md$
+  # Always use the canonical relative form regardless of --target; strip any
+  # leading './' or absolute prefix and rebuild from the eidolon name.
+  _spec_file=".eidolons/${EIDOLON_NAME}/SPEC.md"
+
   cat > "$MANIFEST_PATH" <<MANIFEST_EOF
 {
   "eidolon": "${EIDOLON_NAME}",
@@ -671,6 +676,7 @@ if [[ "$DRY_RUN" != "true" ]]; then
   "installed_at": "${_installed_at}",
   "target": "${TARGET}",
   "ecl_version_emitted": "${ECL_VERSION_EMITTED:-}",
+  "spec_file": "${_spec_file}",
   "hosts_wired": ${_hosts_json},
   "files_written": ${_files_json},
   "handoffs_declared": {
