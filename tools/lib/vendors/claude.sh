@@ -3,7 +3,7 @@
 # Detects and installs SPECTRA for Claude Code (.claude/ directory).
 #
 # Agent mode:   .claude/agents/spectra-planner.md
-# Skill mode:   .claude/skills/spectra-methodology/{SKILL.md,SPECTRA.md,resources/}
+# Skill mode:   .claude/skills/spectra-methodology/{SKILL.md,SPEC.md,resources/}
 #
 # SPECTRA v4.2.0 — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
@@ -39,7 +39,7 @@ _claude_install_agent() {
   fi
 
   local spectra_content
-  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPECTRA.md")
+  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPEC.md")
 
   local tmpl
   tmpl=$(cat "${SPECTRA_HOME}/assets/templates/agent-planner.md.tmpl")
@@ -59,7 +59,7 @@ _claude_install_skill() {
   _ensure_dir "$resources_dir"
 
   _copy_asset "methodology/SKILL.md"    "${skill_dir}/SKILL.md"
-  _copy_asset "methodology/SPECTRA.md"  "${skill_dir}/SPECTRA.md"
+  _copy_asset "methodology/SPEC.md"     "${skill_dir}/SPEC.md"
   _copy_asset "methodology/scoring.md"  "${resources_dir}/scoring.md"
   _copy_asset "methodology/templates.md" "${resources_dir}/templates.md"
 }

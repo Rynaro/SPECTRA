@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# install.sh — SPECTRA EIIS v1.2 Installer
+# install.sh — SPECTRA EIIS v1.3 Installer
 #
 # Installs SPECTRA into a consumer project following the EIIS v1.2 interface
 # contract. Writes methodology files to a target directory, creates per-host
@@ -22,12 +22,12 @@
 #   --version             Print Eidolon version
 #   -h, --help            Show help
 #
-# SPECTRA v4.3.0+ — https://github.com/Rynaro/SPECTRA
+# SPECTRA v4.4.0+ — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.3.2"
+readonly EIDOLON_VERSION="4.4.0"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -38,7 +38,7 @@ for _arg in "$@"; do
       cat <<EOF
 Usage: bash install.sh [OPTIONS]
 
-Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.2).
+Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.3).
 
 Options:
   --target DIR          Target install dir (default: ./.eidolons/spectra)
@@ -80,7 +80,7 @@ fi
 
 # Source files (relative to SCRIPT_DIR)
 readonly SRC_AGENT="${SCRIPT_DIR}/agent.md"
-readonly SRC_SPECTRA="${SCRIPT_DIR}/docs/spectra-methodology/SPECTRA.md"
+readonly SRC_SPEC="${SCRIPT_DIR}/docs/spectra-methodology/SPEC.md"
 readonly SRC_SCORING="${SCRIPT_DIR}/docs/spectra-methodology/scoring.md"
 readonly SRC_TEMPLATES="${SCRIPT_DIR}/docs/spectra-methodology/templates.md"
 readonly SRC_PLANNING_ARTIFACT="${SCRIPT_DIR}/templates/planning-artifact.md"
@@ -170,7 +170,7 @@ fi
 
 # --- Validate source files ---
 if [[ "$MANIFEST_ONLY" != "true" ]]; then
-  for _f in "$SRC_AGENT" "$SRC_SPECTRA" "$SRC_SCORING" "$SRC_TEMPLATES" "$SRC_PLANNING_ARTIFACT"; do
+  for _f in "$SRC_AGENT" "$SRC_SPEC" "$SRC_SCORING" "$SRC_TEMPLATES" "$SRC_PLANNING_ARTIFACT"; do
     if [[ ! -f "$_f" ]]; then
       echo "Error: source file not found: ${_f}" >&2
       echo "Run this script from the SPECTRA repo root or a full clone." >&2
@@ -301,8 +301,8 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   fi
 
   copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
-  copy_file "$SRC_SPECTRA"           "${TARGET}/SPECTRA.md"                     "spec"
-  copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "spec"
+  copy_file "$SRC_SPEC"              "${TARGET}/SPEC.md"                        "spec"
+  copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "other"
   copy_file "$SRC_TEMPLATES"         "${TARGET}/templates.md"                   "template"
   copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
 
@@ -314,29 +314,19 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
     copy_file "$SRC_SPEC_ENVELOPE_TMPL"   "${TARGET}/templates/spec.envelope.json"         "template"
   fi
 
-  # Rewrite relative research/ links in the installed SPECTRA.md so they
+  # Rewrite relative research/ links in the installed SPEC.md so they
   # resolve locally (research docs copied below) — `../research/` was valid
   # from the source-repo `docs/spectra-methodology/` but breaks after copy.
-  if [[ "$DRY_RUN" != "true" && -f "${TARGET}/SPECTRA.md" ]]; then
+  if [[ "$DRY_RUN" != "true" && -f "${TARGET}/SPEC.md" ]]; then
     sed_tmp="$(mktemp)"
     # Portable in-place rewrite: read → transform → write
-    sed 's|](\.\./research/|](./research/|g' "${TARGET}/SPECTRA.md" > "$sed_tmp"
-    mv "$sed_tmp" "${TARGET}/SPECTRA.md"
-  fi
-
-  # Copy the canonical skills tree (source of truth for per-vendor wiring too)
-  if [[ "$DRY_RUN" != "true" ]]; then
-    mkdir -p "${TARGET}/skills"
-    cp -R "${SRC_SKILLS_DIR}/." "${TARGET}/skills/"
-    log_ok "Wrote: ${TARGET}/skills/"
-    FILES_WRITTEN+=("${TARGET}/skills|skill|created")
-  else
-    log_dry "copy ${SRC_SKILLS_DIR}/ → ${TARGET}/skills/"
+    sed 's|](\.\./research/|](./research/|g' "${TARGET}/SPEC.md" > "$sed_tmp"
+    mv "$sed_tmp" "${TARGET}/SPEC.md"
   fi
 
   # Copy research docs into the installed target so the methodology is
   # self-contained offline — no WebFetch / permission-gated network calls
-  # to resolve SPECTRA.md's citations.
+  # to resolve SPEC.md's citations.
   if [[ "$DRY_RUN" != "true" && -d "${SCRIPT_DIR}/docs/research" ]]; then
     mkdir -p "${TARGET}/research"
     for _f in "${SCRIPT_DIR}/docs/research"/*.md; do
@@ -387,12 +377,21 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   SHARED_BLOCK="## SPECTRA — Decision-ready specifications (v${EIDOLON_VERSION})
 
 Entry:     \`${TARGET_REL}/agent.md\`
-Full spec: \`${TARGET_REL}/SPECTRA.md\`
+Full spec: \`${TARGET_REL}/SPEC.md\`
 Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → Refine → Assemble
 
 **P0 (non-negotiable):** READ-ONLY during all planning phases (no code edits); dual-format output (Markdown + YAML/JSON); CLARIFY first (parse WHO/WHAT/WHY/CONSTRAINTS); confidence ≥85% at Assemble (else Refine, max 3 cycles); output is a specification, never an implementation."
 
-  # --- Per-skill vendor wiring helpers ---
+  # --- Per-skill vendor wiring (EIIS v1.3 §4.2.4 dual-write) ---
+  #
+  # wire_skill <skill_name>
+  #
+  # Dual-writes a skill file per EIIS v1.3 §4.2.4:
+  #   - source-of-truth (flat): ${TARGET}/skills/<skill_name>.md
+  #   - vendor copy:            .claude/skills/spectra-<skill_name>/SKILL.md
+  #
+  # Source file resolved as: ${SRC_SKILLS_DIR}/<skill_name>.md
+  # Bash 3.2 compatible (no declare -A, no ${var,,}, no readarray).
   strip_frontmatter() {
     local f="$1"
     if [[ "$(head -1 "$f")" == "---" ]]; then
@@ -411,60 +410,64 @@ Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → 
     ' "$1"
   }
   wire_skill() {
-    local src_dir="$1" skill_name="$2"
-    local src_skill="${src_dir}/SKILL.md"
-    [[ -f "$src_skill" ]] || return
-    local description
-    description="$(extract_fm_field "$src_skill" "description")"
-    [[ -z "$description" ]] && description="${skill_name}"
+    local skill="$1"
+    local src="${SRC_SKILLS_DIR}/${skill}.md"
+    local dst_src="${TARGET}/skills/${skill}.md"
+    local dst_vendor=".claude/skills/${EIDOLON_NAME}-${skill}/SKILL.md"
 
-    local host
-    for host in "${_host_list[@]}"; do
-      host="${host// /}"
-      case "$host" in
-        claude-code)
-          local dst_dir=".claude/skills/${skill_name}"
-          if [[ "$DRY_RUN" == "true" ]]; then
-            log_dry "copy ${src_dir}/ → ${dst_dir}/"
-          else
-            rm -rf "$dst_dir"
-            mkdir -p "$dst_dir"
-            cp -R "${src_dir}/." "${dst_dir}/"
-            FILES_WRITTEN+=("${dst_dir}/SKILL.md|skill|created")
-            log_ok "Wrote: ${dst_dir}/"
-          fi
-          ;;
-        copilot)
-          local dst=".github/instructions/${skill_name}.instructions.md"
-          if [[ "$DRY_RUN" == "true" ]]; then
-            log_dry "write ${dst}"
-          else
-            mkdir -p ".github/instructions"
-            { echo "---"; echo "applyTo: \"**\""; echo "description: \"${description}\""; echo "---"; strip_frontmatter "$src_skill"; } > "$dst"
-            FILES_WRITTEN+=("${dst}|skill|created")
-            log_ok "Wrote: ${dst}"
-          fi
-          ;;
-        cursor)
-          local dst=".cursor/rules/${skill_name}.mdc"
-          if [[ "$DRY_RUN" == "true" ]]; then
-            log_dry "write ${dst}"
-          else
-            mkdir -p ".cursor/rules"
-            { echo "---"; echo "description: \"${description}\""; echo "alwaysApply: false"; echo "---"; strip_frontmatter "$src_skill"; } > "$dst"
-            FILES_WRITTEN+=("${dst}|skill|created")
-            log_ok "Wrote: ${dst}"
-          fi
-          ;;
-      esac
-    done
+    if [[ ! -f "${src}" ]]; then
+      log_warn "skill source not found: ${src}"
+      return
+    fi
+
+    if [[ "$DRY_RUN" == "true" ]]; then
+      log_dry "skill source-of-truth: ${dst_src}"
+      log_dry "skill vendor copy:     ${dst_vendor}"
+      return
+    fi
+
+    # Source-of-truth flat write (always, host-independent)
+    mkdir -p "$(dirname "${dst_src}")"
+    cp "${src}" "${dst_src}"
+    FILES_WRITTEN+=("${dst_src}|skill|created")
+    log_ok "Wrote: ${dst_src}"
+
+    # Vendor copy for claude-code host
+    if printf '%s\n' "${HOSTS}" | grep -q 'claude-code'; then
+      mkdir -p "$(dirname "${dst_vendor}")"
+      cp "${src}" "${dst_vendor}"
+      FILES_WRITTEN+=("${dst_vendor}|skill|created")
+      log_ok "Wrote: ${dst_vendor}"
+    fi
+
+    # Copilot vendor copy
+    local description
+    description="$(extract_fm_field "${src}" "description")"
+    [[ -z "$description" ]] && description="${skill}"
+    if printf '%s\n' "${HOSTS}" | grep -q 'copilot'; then
+      local dst_copilot=".github/instructions/${EIDOLON_NAME}-${skill}.instructions.md"
+      mkdir -p ".github/instructions"
+      { echo "---"; echo "applyTo: \"**\""; echo "description: \"${description}\""; echo "---"; strip_frontmatter "${src}"; } > "${dst_copilot}"
+      FILES_WRITTEN+=("${dst_copilot}|skill|created")
+      log_ok "Wrote: ${dst_copilot}"
+    fi
+
+    # Cursor vendor copy
+    if printf '%s\n' "${HOSTS}" | grep -q 'cursor'; then
+      local dst_cursor=".cursor/rules/${EIDOLON_NAME}-${skill}.mdc"
+      mkdir -p ".cursor/rules"
+      { echo "---"; echo "description: \"${description}\""; echo "alwaysApply: false"; echo "---"; strip_frontmatter "${src}"; } > "${dst_cursor}"
+      FILES_WRITTEN+=("${dst_cursor}|skill|created")
+      log_ok "Wrote: ${dst_cursor}"
+    fi
   }
 
-  # Emit per-skill vendor files for every skill directory.
-  for skill_dir in "${SRC_SKILLS_DIR}"/*/; do
-    [[ -d "$skill_dir" ]] || continue
-    skill_name="$(basename "$skill_dir")"
-    wire_skill "$skill_dir" "${EIDOLON_NAME}-${skill_name}"
+  # Emit per-skill files for every flat skill source.
+  mkdir -p "${TARGET}/skills"
+  for _skill_src in "${SRC_SKILLS_DIR}"/*.md; do
+    [[ -f "$_skill_src" ]] || continue
+    _skill_slug="$(basename "${_skill_src}" .md)"
+    wire_skill "${_skill_slug}"
   done
 
   # AGENTS.md (shared dispatch) — opt-in only.
@@ -507,8 +510,8 @@ ambiguity.
 ## References
 
 - \`${TARGET}/agent.md\` — P0 rules (read if deeper context is needed)
-- \`${TARGET}/SPECTRA.md\` — full methodology specification
-- \`${TARGET}/skills/planning/SKILL.md\` — progressive-disclosure routing card
+- \`${TARGET}/SPEC.md\` — full methodology specification
+- \`${TARGET}/skills/planning.md\` — progressive-disclosure routing card
 AGENT
             FILES_WRITTEN+=(".claude/agents/${EIDOLON_NAME}.md|dispatch|created")
             log_ok "Wrote: .claude/agents/${EIDOLON_NAME}.md"
@@ -549,7 +552,7 @@ AGENT
 "# SPECTRA — Planning Specialist
 
 Entry point: \`${TARGET}/agent.md\`
-Full spec:   \`${TARGET}/SPECTRA.md\`
+Full spec:   \`${TARGET}/SPEC.md\`
 
 SPECTRA produces specifications, never code. Activate for tasks with complexity ≥7/12."
           else
@@ -601,8 +604,8 @@ ambiguity.
 ## References
 
 - \`${TARGET}/agent.md\` — P0 rules (read if deeper context is needed)
-- \`${TARGET}/SPECTRA.md\` — full methodology specification
-- \`${TARGET}/skills/planning/SKILL.md\` — progressive-disclosure routing card
+- \`${TARGET}/SPEC.md\` — full methodology specification
+- \`${TARGET}/skills/planning.md\` — progressive-disclosure routing card
 CODEX
             FILES_WRITTEN+=(".codex/agents/${EIDOLON_NAME}.md|dispatch|created")
             log_ok "Wrote: .codex/agents/${EIDOLON_NAME}.md"
@@ -658,7 +661,33 @@ if [[ "$DRY_RUN" != "true" ]]; then
   done
   _hosts_json+="]"
 
+  # Build skills[] JSON array (EIIS v1.3 §4.2.4 dual-write records).
+  # source_path must match ^\.eidolons/<slug>/skills/<skill>.md
+  # TARGET_REL strips any leading "./" so it is already ".eidolons/spectra".
+  _skills_json="[]"
+  _sk=""
+  _add_skill() {
+    local _name="$1"
+    local _src_path="${TARGET_REL}/skills/${_name}.md"
+    local _vendor_path=".claude/skills/${EIDOLON_NAME}-${_name}/SKILL.md"
+    local _src_sha _vendor_sha
+    _src_sha="$(sha256_of "${TARGET}/skills/${_name}.md" 2>/dev/null || echo "00000000")"
+    if printf '%s\n' "${HOSTS}" | grep -q 'claude-code' && [[ -f "${_vendor_path}" ]]; then
+      _vendor_sha="$(sha256_of "${_vendor_path}" 2>/dev/null || echo "00000000")"
+      _sk+="{\"name\":\"${_name}\",\"source_path\":\"${_src_path}\",\"vendor_path\":\"${_vendor_path}\",\"source_sha256\":\"${_src_sha}\",\"vendor_sha256\":\"${_vendor_sha}\"},"
+    else
+      _sk+="{\"name\":\"${_name}\",\"source_path\":\"${_src_path}\",\"source_sha256\":\"${_src_sha}\"},"
+    fi
+  }
+  _add_skill "planning"
+  _skills_json="[${_sk%,}]"
+
   _installed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "1970-01-01T00:00:00Z")
+
+  # Canonical spec_file path (EIIS v1.3 §1.8) — schema pattern: ^\.eidolons/[a-z][a-z0-9-]*/SPEC\.md$
+  # Always use the canonical relative form regardless of --target; strip any
+  # leading './' or absolute prefix and rebuild from the eidolon name.
+  _spec_file=".eidolons/${EIDOLON_NAME}/SPEC.md"
 
   cat > "$MANIFEST_PATH" <<MANIFEST_EOF
 {
@@ -668,6 +697,8 @@ if [[ "$DRY_RUN" != "true" ]]; then
   "installed_at": "${_installed_at}",
   "target": "${TARGET}",
   "ecl_version_emitted": "${ECL_VERSION_EMITTED:-}",
+  "spec_file": "${_spec_file}",
+  "skills": ${_skills_json},
   "hosts_wired": ${_hosts_json},
   "files_written": ${_files_json},
   "handoffs_declared": {

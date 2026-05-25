@@ -2,7 +2,7 @@
 
 Deeper treatment of the decision-theoretic, information-theoretic, and cognitive science principles underlying SPECTRA's architecture. This document is for researchers, methodology evaluators, and contributors who want to understand *why* SPECTRA's design decisions are optimal, not just *what* they are.
 
-For practitioners: you don't need this file. The core [SPECTRA.md](SPECTRA.md) is self-contained.
+For practitioners: you don't need this file. The core [SPEC.md](../spectra-methodology/SPEC.md) is self-contained.
 
 ---
 

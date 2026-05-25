@@ -122,6 +122,45 @@
       "pattern": "^([0-9]+\\.[0-9]+(\\.[0-9]+)?)?$",
       "description": "ECL spec version this Eidolon emits per its ECL_VERSION file. Empty string when ECL_VERSION is absent. Optional field — older installs without ECL_VERSION still validate."
     },
+    "spec_file": {
+      "type": "string",
+      "pattern": "^\\.eidolons/[a-z][a-z0-9-]*/SPEC\\.md$",
+      "description": "Canonical full-spec path (v1.3+). MUST point at the SPEC.md emitted by this install. Optional in v1.2 manifests; SHOULD be present from v1.3."
+    },
+    "skills": {
+      "type": "array",
+      "description": "Skills emitted by this install, with both source-of-truth and host-vendor paths (v1.3+).",
+      "items": {
+        "type": "object",
+        "required": ["name", "source_path", "source_sha256"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Skill slug, e.g. 'planning'."
+          },
+          "source_path": {
+            "type": "string",
+            "pattern": "^\\.eidolons/[a-z][a-z0-9-]*/skills/[a-z][a-z0-9-]*\\.md$",
+            "description": "Source-of-truth flat path."
+          },
+          "source_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          },
+          "vendor_path": {
+            "type": "string",
+            "pattern": "^\\.claude/skills/[a-z][a-z0-9-]*-[a-z][a-z0-9-]*/SKILL\\.md$",
+            "description": "Claude Code host vendor copy. Present when claude-code is in hosts_wired."
+          },
+          "vendor_sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "security": {
       "type": "object",
       "description": "Self-declared security posture of this Eidolon.",

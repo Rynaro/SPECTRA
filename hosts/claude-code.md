@@ -34,8 +34,8 @@ The installer appends this pointer automatically:
 **EIIS install path:**
 ```
 .eidolons/spectra/agent.md          ← always-loaded entry
-.eidolons/spectra/SPECTRA.md        ← full methodology
-.eidolons/spectra/SKILL.md          ← quick routing card
+.eidolons/spectra/SPEC.md           ← full methodology
+.eidolons/spectra/skills/planning.md ← quick routing card
 .eidolons/spectra/scoring.md        ← rubrics
 .eidolons/spectra/templates.md      ← output formats
 ```
@@ -67,4 +67,4 @@ The pointer must be in `CLAUDE.md` at the project root, not only in `.claude/`.
 (direct install) or `.eidolons/spectra/` (EIIS install). See `INSTALL.md` for the full path matrix.
 
 **Token budget:** `agent.md` is ≤1000 tokens by design. If Claude Code truncates context,
-load `SPECTRA.md` explicitly: `@.eidolons/spectra/SPECTRA.md`.
+load `SPEC.md` explicitly: `@.eidolons/spectra/SPEC.md`.

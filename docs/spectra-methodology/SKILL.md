@@ -21,7 +21,7 @@ Use SPECTRA when your AI agent needs to plan before it acts.
 
 | Need | Load |
 |------|------|
-| Full cognitive architecture | `docs/spectra-methodology/SPECTRA.md` |
+| Full cognitive architecture | `docs/spectra-methodology/SPEC.md` |
 | Scoring matrices + rubrics | `docs/spectra-methodology/scoring.md` |
 | Output formats per phase | `docs/spectra-methodology/templates.md` |
 | Worked examples | `examples/` |

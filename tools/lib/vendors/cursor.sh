@@ -44,7 +44,7 @@ _cursor_install_agent() {
   fi
 
   local spectra_content
-  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPECTRA.md")
+  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPEC.md")
 
   cat > "$target" <<CURSOR_AGENT_EOF
 ---
@@ -75,9 +75,9 @@ _cursor_install_skill() {
   local skill_content
   skill_content=$(cat "${SPECTRA_HOME}/assets/methodology/SKILL.md")
   local spectra_content
-  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPECTRA.md")
+  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPEC.md")
 
-  # Cursor skill: SKILL.md as frontmatter-driven rule, SPECTRA.md as reference
+  # Cursor skill: SKILL.md as frontmatter-driven rule, SPEC.md as reference
   cat > "$target" <<CURSOR_SKILL_EOF
 ---
 description: SPECTRA methodology quick-reference. Use when planning features or decomposing stories.
@@ -91,7 +91,7 @@ CURSOR_SKILL_EOF
   INSTALLED_FILES+=("${target}|SPECTRA methodology skill (Cursor)")
   log_ok "Created: ${target}"
 
-  _cursor_copy_asset "methodology/SPECTRA.md"   "${resources_dir}/SPECTRA.md"
+  _cursor_copy_asset "methodology/SPEC.md"       "${resources_dir}/SPEC.md"
   _cursor_copy_asset "methodology/scoring.md"   "${resources_dir}/scoring.md"
   _cursor_copy_asset "methodology/templates.md" "${resources_dir}/templates.md"
 }

@@ -9,7 +9,7 @@ These are the files physically installed into the user's project.
 
 | File | Purpose |
 |------|---------|
-| `SPECTRA.md` | Full methodology reference |
+| `SPEC.md` | Full methodology reference |
 | `SKILL.md` | Quick-reference card (skill mode) |
 | `scoring.md` | Complexity rubrics and scoring tables |
 | `templates.md` | Output format templates |
