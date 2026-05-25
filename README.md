@@ -2,7 +2,7 @@
 
 **A vendor-agnostic planning methodology for AI agents that think before they code.**
 
-[![SPECTRA v4.2](https://img.shields.io/badge/methodology-SPECTRA_v4.2-6366f1)](docs/spectra-methodology/SPECTRA.md)
+[![SPECTRA v4.2](https://img.shields.io/badge/methodology-SPECTRA_v4.2-6366f1)](docs/spectra-methodology/SPEC.md)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/license-CC_BY--SA_4.0-green)](LICENSE)
 [![Research: 15+ papers](https://img.shields.io/badge/research-15%2B_papers-blue)](docs/research/REFERENCES.md)
 [![Benchmarks: Coming Soon](https://img.shields.io/badge/benchmarks-coming_soon-orange)](docs/benchmarks/README.md)
@@ -169,8 +169,8 @@ bash tools/spectra-init.sh /path/to/project
 
 | Vendor | Agent Mode | Skill Mode |
 |--------|-----------|-----------|
-| **Claude Code** | `.claude/agents/spectra-planner.md` | `.claude/skills/spectra-methodology/{SKILL.md, SPECTRA.md, resources/}` |
-| **GitHub Copilot** | `.github/agents/spectra-planner.agent.md` | `.github/skills/spectra-methodology/{SKILL.md, SPECTRA.md, resources/}` |
+| **Claude Code** | `.claude/agents/spectra-planner.md` | `.claude/skills/spectra-planning/SKILL.md` |
+| **GitHub Copilot** | `.github/agents/spectra-planner.agent.md` | `.github/instructions/spectra-planning.instructions.md` |
 | **Cursor** | `.cursor/agents/spectra-planner.mdc` | `.cursor/rules/spectra-methodology.mdc` (+ resources/) |
 
 All modes also create:
@@ -195,7 +195,7 @@ All modes also create:
 3. **Save output** — Copy the LLM's response into `.spectra/setup/spectra-conventions.md`
 4. **Start planning** — Use SPECTRA for your next feature. Invoke `@spectra-planner` (Agent mode) or reference the skill (Skill mode)
 
-For a detailed walkthrough of the SPECTRA planning cycle, see [SPECTRA.md](docs/spectra-methodology/SPECTRA.md).
+For a detailed walkthrough of the SPECTRA planning cycle, see [SPEC.md](docs/spectra-methodology/SPEC.md).
 
 ---
 
@@ -203,7 +203,7 @@ For a detailed walkthrough of the SPECTRA planning cycle, see [SPECTRA.md](docs/
 
 | Start Here | Then | Deep Dives |
 |------------|------|------------|
-| [**SPECTRA.md**](docs/spectra-methodology/SPECTRA.md) | [scoring.md](docs/spectra-methodology/scoring.md) | [THEORY.md](docs/research/THEORY.md) |
+| [**SPEC.md**](docs/spectra-methodology/SPEC.md) | [scoring.md](docs/spectra-methodology/scoring.md) | [THEORY.md](docs/research/THEORY.md) |
 | Full cognitive architecture | Rubrics, matrices, validation | Decision theory, information theory, cognitive science |
 
 ---
@@ -216,7 +216,7 @@ Organized by **what you need to do**:
 SPECTRA/
 │
 ├── 📖 docs/spectra-methodology/   USE: Learn and apply the methodology
-│   ├── SPECTRA.md                  Core cognitive architecture (start here)
+│   ├── SPEC.md                     Core cognitive architecture (start here)
 │   ├── SKILL.md                    Quick-reference routing card
 │   ├── scoring.md                  All rubrics, matrices, validation criteria
 │   └── templates.md                Copy-paste output formats per phase

@@ -21,15 +21,15 @@ SPECTRA (Strategic Specification through Deliberate Reasoning) is a vendor-agnos
 
 | Phase | Purpose | Skill file |
 |-------|---------|-----------|
-| CLARIFY | Disambiguate intent + gather context | `docs/spectra-methodology/SPECTRA.md` |
-| S — Scope | Classify intent, score complexity, set boundaries | `docs/spectra-methodology/SPECTRA.md` |
-| P — Pattern | Survey codebase, catalog patterns | `docs/spectra-methodology/SPECTRA.md` |
+| CLARIFY | Disambiguate intent + gather context | `docs/spectra-methodology/SPEC.md` |
+| S — Scope | Classify intent, score complexity, set boundaries | `docs/spectra-methodology/SPEC.md` |
+| P — Pattern | Survey codebase, catalog patterns | `docs/spectra-methodology/SPEC.md` |
 | E — Explore | Generate 3–5 hypotheses, score on 7-dim rubric | `docs/spectra-methodology/scoring.md` |
 | C — Construct | Write the specification | `docs/spectra-methodology/templates.md` |
 | T — Test | 6-layer verification | `docs/spectra-methodology/scoring.md` |
-| R — Refine | Reflexion-style self-critique | `docs/spectra-methodology/SPECTRA.md` |
+| R — Refine | Reflexion-style self-critique | `docs/spectra-methodology/SPEC.md` |
 | A — Assemble | Finalize + persist dual-format artifact | `docs/spectra-methodology/templates.md` |
 
 ## Full spec
 
-`docs/spectra-methodology/SPECTRA.md`
+`docs/spectra-methodology/SPEC.md`

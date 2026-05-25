@@ -21,7 +21,7 @@ The installer creates or appends this file automatically:
 
 The SPECTRA planning agent is installed at `.eidolons/spectra/`.
 Entry point: `.eidolons/spectra/agent.md`
-Full spec: `.eidolons/spectra/SPECTRA.md`
+Full spec: `.eidolons/spectra/SPEC.md`
 ```
 
 **Copilot agent mode** (`.github/agents/`):
@@ -54,8 +54,8 @@ and references `.eidolons/spectra/agent.md`. Copilot must have "custom instructi
 enabled (Settings → Copilot → Custom Instructions).
 
 **File size limits:** If Copilot truncates the instructions, keep only the
-`agent.md` pointer in `.github/copilot-instructions.md`. Load `SPECTRA.md`
-on demand by pasting its path into the chat.
+`agent.md` pointer in `.github/copilot-instructions.md`. Load `SPEC.md`
+on demand by pasting its path into the chat: `.eidolons/spectra/SPEC.md`.
 
 **Workspace agent not found:** Copilot Workspace agent mode requires
 `.github/agents/spectra-planner.agent.md`. Run the direct installer

@@ -21,7 +21,7 @@ The agent file content:
 # SPECTRA — Planning Specialist
 
 Entry point: `.eidolons/spectra/agent.md`
-Full spec: `.eidolons/spectra/SPECTRA.md`
+Full spec: `.eidolons/spectra/SPEC.md`
 
 SPECTRA produces specifications, never code. Activate for tasks with complexity ≥7/12.
 ```

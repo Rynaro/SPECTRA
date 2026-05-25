@@ -3,7 +3,7 @@
 # Detects and installs SPECTRA for GitHub Copilot (.github/ directory).
 #
 # Agent mode:   .github/agents/spectra-planner.agent.md
-# Skill mode:   .github/skills/spectra-methodology/{SKILL.md,SPECTRA.md,resources/}
+# Skill mode:   .github/skills/spectra-methodology/{SKILL.md,SPEC.md,resources/}
 #
 # SPECTRA v4.2.0 — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
@@ -41,7 +41,7 @@ _copilot_install_agent() {
   fi
 
   local spectra_content
-  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPECTRA.md")
+  spectra_content=$(cat "${SPECTRA_HOME}/assets/methodology/SPEC.md")
 
   # Copilot agent files use a specific frontmatter format
   cat > "$target" <<AGENT_EOF
@@ -66,7 +66,7 @@ _copilot_install_skill() {
   _copilot_ensure_dir "$resources_dir"
 
   _copilot_copy_asset "methodology/SKILL.md"     "${skill_dir}/SKILL.md"
-  _copilot_copy_asset "methodology/SPECTRA.md"   "${skill_dir}/SPECTRA.md"
+  _copilot_copy_asset "methodology/SPEC.md"       "${skill_dir}/SPEC.md"
   _copilot_copy_asset "methodology/scoring.md"   "${resources_dir}/scoring.md"
   _copilot_copy_asset "methodology/templates.md" "${resources_dir}/templates.md"
 }

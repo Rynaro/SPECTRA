@@ -7,11 +7,11 @@
   "hosts_wired": ["claude-code", "copilot", "cursor", "opencode", "codex"],
   "files_written": [
     {"path": "./.eidolons/spectra/agent.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "entry-point", "mode": "created"},
-    {"path": "./.eidolons/spectra/SPECTRA.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "spec", "mode": "created"},
+    {"path": "./.eidolons/spectra/SPEC.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "spec", "mode": "created"},
     {"path": "./.eidolons/spectra/scoring.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "spec", "mode": "created"},
     {"path": "./.eidolons/spectra/templates.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "template", "mode": "created"},
     {"path": "./.eidolons/spectra/templates/planning-artifact.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "template", "mode": "created"},
-    {"path": "./.eidolons/spectra/skills", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "skill", "mode": "created"},
+    {"path": "./.eidolons/spectra/skills/planning.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "skill", "mode": "created"},
     {"path": ".claude/skills/spectra-planning/SKILL.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "skill", "mode": "created"},
     {"path": ".github/instructions/spectra-planning.instructions.md", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "skill", "mode": "created"},
     {"path": ".cursor/rules/spectra-planning.mdc", "sha256": "0000000000000000000000000000000000000000000000000000000000000000", "role": "skill", "mode": "created"},

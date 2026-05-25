@@ -33,7 +33,7 @@ See `skills/spectra/SKILL.md` — loaded on demand per phase.
 
 ## Full specification
 
-`docs/spectra-methodology/SPECTRA.md`
+`docs/spectra-methodology/SPEC.md`
 
 ## Install
 

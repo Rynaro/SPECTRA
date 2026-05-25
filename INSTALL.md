@@ -55,8 +55,8 @@ bash install.sh --non-interactive --hosts all
 ```
 .eidolons/spectra/
 ├── agent.md                     ← always-loaded entry point (≤1000 tokens)
-├── SPECTRA.md                   ← full methodology
-├── SKILL.md                     ← quick routing card
+├── SPEC.md                      ← full methodology
+├── skills/planning.md           ← quick routing card
 ├── scoring.md                   ← rubrics and matrices
 ├── templates.md                 ← output formats
 └── install.manifest.json        ← EIIS manifest (validated by schemas/install.manifest.v1.json)

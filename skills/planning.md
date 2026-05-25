@@ -27,7 +27,7 @@ READ-ONLY during all phases — produce specifications, never code.
 
 This SKILL.md is the routing card. Escalate on demand:
 
-- `.eidolons/spectra/SPECTRA.md` — full cognitive architecture
+- `.eidolons/spectra/SPEC.md` — full cognitive architecture
 - `.eidolons/spectra/scoring.md` — scoring rubrics and matrices
 - `.eidolons/spectra/templates.md` — output formats per phase
 - `.eidolons/spectra/templates/planning-artifact.md` — spec artifact template

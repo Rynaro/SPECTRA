@@ -10,7 +10,7 @@ The core cycle: **CLARIFY → S(cope) → P(attern) → E(xplore) → C(onstruct
 
 ## Repository Layout
 
-- `docs/spectra-methodology/` — Core methodology files (SPECTRA.md is the primary document, scoring.md has all rubrics, templates.md has output formats, SKILL.md is a quick-reference card)
+- `docs/spectra-methodology/` — Core methodology files (SPEC.md is the primary document, scoring.md has all rubrics, templates.md has output formats, SKILL.md is a quick-reference card)
 - `docs/research/` — Theoretical foundations, academic references, and the brownfield installation guide (RETROFIT.md)
 - `docs/benchmarks/` — Evaluation framework (data collection in progress)
 - `examples/` — Worked examples (Rails, Node.js) and anti-patterns

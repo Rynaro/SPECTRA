@@ -2,6 +2,20 @@
 
 ## [Unreleased]
 
+## [4.4.0] — 2026-05-25 — EIIS v1.3 install normalization
+
+### Changed
+- BREAKING: full-spec destination renamed `SPECTRA.md` → `SPEC.md` (EIIS v1.3 §1.8). Source file renamed `docs/spectra-methodology/SPECTRA.md` → `docs/spectra-methodology/SPEC.md`.
+- BREAKING: skills layout flattened from `skills/<skill>/SKILL.md` (subdir) to `skills/<skill>.md` (flat, source-of-truth). Vendor copies at `.claude/skills/spectra-<skill>/SKILL.md` unchanged.
+- `install.sh`: `wire_skill` helper rewritten to EIIS v1.3 §4.2.4 dual-write contract (source-of-truth flat path + Claude Code vendor copy). Bash 3.2 compatible.
+- `EIDOLON_VERSION` bumped `4.3.2` → `4.4.0` (MINOR — breaking install-layout change).
+
+### Removed
+- Out-of-sync duplicate `SPECTRA.md` at repo root deleted. Authoritative source is `docs/spectra-methodology/SPEC.md`.
+
+### Compliance
+- `EIIS_VERSION` bumped `1.2` → `1.3`.
+
 ## [4.3.2] — 2026-05-13 — declare ECL v2.0 conformance
 
 ### Changed

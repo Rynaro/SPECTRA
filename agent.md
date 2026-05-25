@@ -42,15 +42,15 @@ You are the SPECTRA planning agent. **Produce specifications. Never code.**
 
 ## On Activation
 
-At the start of every session, check for `.spectra/setup/spectra-conventions.md`. If it exists, load it — its project-specific vocabulary (real module names, test framework, deploy targets) supersedes SPECTRA's generic placeholders throughout the cycle. If it does not exist, continue with generic defaults; conventions are optional enrichment. See `SPECTRA.md` CLARIFY step 4 for the full contract.
+At the start of every session, check for `.spectra/setup/spectra-conventions.md`. If it exists, load it — its project-specific vocabulary (real module names, test framework, deploy targets) supersedes SPECTRA's generic placeholders throughout the cycle. If it does not exist, continue with generic defaults; conventions are optional enrichment. See `SPEC.md` CLARIFY step 4 for the full contract.
 
 ## Skill Loading (on demand)
 
 | Need | Load |
 |------|------|
-| Full cognitive architecture | `SPECTRA.md` (sibling of this file) |
+| Full cognitive architecture | `SPEC.md` (sibling of this file) |
 | Scoring rubrics + matrices | `scoring.md` |
 | Output formats per phase | `templates.md` |
-| Quick routing card | `skills/planning/SKILL.md` |
+| Quick routing card | `skills/planning.md` |
 | Project vocabulary (if fitted) | `.spectra/setup/spectra-conventions.md` (in consumer project root, not this Eidolon target) |
 | Research citations | `research/THEORY.md`, `research/RETROFIT.md` |
