@@ -661,6 +661,27 @@ if [[ "$DRY_RUN" != "true" ]]; then
   done
   _hosts_json+="]"
 
+  # Build skills[] JSON array (EIIS v1.3 §4.2.4 dual-write records).
+  # source_path must match ^\.eidolons/<slug>/skills/<skill>.md
+  # TARGET_REL strips any leading "./" so it is already ".eidolons/spectra".
+  _skills_json="[]"
+  _sk=""
+  _add_skill() {
+    local _name="$1"
+    local _src_path="${TARGET_REL}/skills/${_name}.md"
+    local _vendor_path=".claude/skills/${EIDOLON_NAME}-${_name}/SKILL.md"
+    local _src_sha _vendor_sha
+    _src_sha="$(sha256_of "${TARGET}/skills/${_name}.md" 2>/dev/null || echo "00000000")"
+    if printf '%s\n' "${HOSTS}" | grep -q 'claude-code' && [[ -f "${_vendor_path}" ]]; then
+      _vendor_sha="$(sha256_of "${_vendor_path}" 2>/dev/null || echo "00000000")"
+      _sk+="{\"name\":\"${_name}\",\"source_path\":\"${_src_path}\",\"vendor_path\":\"${_vendor_path}\",\"source_sha256\":\"${_src_sha}\",\"vendor_sha256\":\"${_vendor_sha}\"},"
+    else
+      _sk+="{\"name\":\"${_name}\",\"source_path\":\"${_src_path}\",\"source_sha256\":\"${_src_sha}\"},"
+    fi
+  }
+  _add_skill "planning"
+  _skills_json="[${_sk%,}]"
+
   _installed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "1970-01-01T00:00:00Z")
 
   # Canonical spec_file path (EIIS v1.3 §1.8) — schema pattern: ^\.eidolons/[a-z][a-z0-9-]*/SPEC\.md$
@@ -677,6 +698,7 @@ if [[ "$DRY_RUN" != "true" ]]; then
   "target": "${TARGET}",
   "ecl_version_emitted": "${ECL_VERSION_EMITTED:-}",
   "spec_file": "${_spec_file}",
+  "skills": ${_skills_json},
   "hosts_wired": ${_hosts_json},
   "files_written": ${_files_json},
   "handoffs_declared": {
