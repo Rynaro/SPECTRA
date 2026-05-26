@@ -22,12 +22,12 @@
 #   --version             Print Eidolon version
 #   -h, --help            Show help
 #
-# SPECTRA v4.5.0+ — https://github.com/Rynaro/SPECTRA
+# SPECTRA v4.5.1+ — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.5.0"
+readonly EIDOLON_VERSION="4.5.1"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
