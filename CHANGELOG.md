@@ -2,6 +2,45 @@
 
 ## [Unreleased]
 
+## [4.5.0] — 2026-05-26 — EIIS v1.4 canonical inventory
+
+### Changed
+- Declares EIIS v1.4 conformance (`EIIS_VERSION = 1.4`).
+- BREAKING (install-target): `scoring.md` and `templates.md` are no longer
+  copied to `<target>/` root. They now land at `<target>/templates/scoring.md`
+  and `<target>/templates/catalog.md` respectively (both with `role: "template"`).
+  Source-of-truth at `docs/spectra-methodology/scoring.md` retained;
+  `docs/spectra-methodology/templates.md` renamed to
+  `docs/spectra-methodology/catalog.md`.
+- BREAKING (install-target): `research/`, `tools/`, and `commands/` directories
+  are no longer copied to the install target (not in EIIS v1.4 §1.9.1 whitelist).
+  Source-repo copies at these paths are unchanged.
+- `agent.md` skill-loading table updated: `scoring.md` → `templates/scoring.md`,
+  `templates.md` → `templates/catalog.md`; `research/` citations row removed
+  (research/ no longer installed to target).
+- `.claude/agents/spectra.md` heredoc rewritten per EIIS v1.4 §4.2.6: references
+  both `agent.md` and `SPEC.md`; no legacy filenames; no subdir-skill paths.
+- `agent.md` role in `files_written[]` changed from `entry-point` to
+  `agent-profile` (EIIS v1.4 §1.8.6).
+- `ECL_VERSION` role in `files_written[]` changed from `other` to `ecl-version`
+  (EIIS v1.4 §3.7.1).
+
+### Added
+- Manifest-driven `canonical_inventory_sweep` at install-end (EIIS v1.4 §6.X):
+  sweeps any file under the install target not tracked in `files_written[]`.
+- `cleanup_legacy_v1_2` extended: sweeps `scoring.md` and `templates.md` from
+  install-target root (v4.4.1 residue) and the non-whitelisted `research/`,
+  `tools/`, `commands/` directories.
+- `canonical_inventory_strict: true` added to `install.manifest.json`.
+- Vendored `schemas/install.manifest.v1.json` synced from EIIS v1.4 (adds
+  `agent-profile` and `ecl-version` role values; adds `canonical_inventory_strict`
+  field).
+
+### Fixed
+- Previously emitted two `role: "spec"` entries (`SPEC.md` and `scoring.md`)
+  — violation of EIIS v1.3 §1.8.3 / v1.4 §1.8.3. Now exactly one `role: "spec"`
+  entry per install (closes scout G8, G9).
+
 ## [4.4.1] — 2026-05-26
 
 ### Fixed
