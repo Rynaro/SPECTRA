@@ -347,6 +347,9 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
     log_dry "mkdir -p ${TARGET} ${TARGET}/templates ${TARGET}/schemas"
   fi
 
+  # Sweep legacy v1.2-era artefacts before writing any new content.
+  cleanup_legacy_v1_2 "${TARGET}"
+
   copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
   copy_file "$SRC_SPEC"              "${TARGET}/SPEC.md"                        "spec"
   copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "other"
