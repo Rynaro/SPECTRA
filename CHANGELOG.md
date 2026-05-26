@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [4.4.1] — 2026-05-26
+
+### Fixed
+- `install.sh` now sweeps legacy v1.2-era artefacts on upgrade: removes stale
+  `<TARGET>/SPECTRA.md` and any `<TARGET>/skills/planning/` subdir tree left
+  behind by pre-v1.3 installs. Fresh installs are unaffected (no-op when files
+  are absent). `cleanup_legacy_v1_2` helper runs before the first content write.
+
 ## [4.4.0] — 2026-05-25 — EIIS v1.3 install normalization
 
 ### Changed
