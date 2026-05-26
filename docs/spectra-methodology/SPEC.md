@@ -326,7 +326,7 @@ SPECTRA v4.3.0 adopts **ECL v1.0** (Eidolons Communication Layer) for envelope e
 | ECL version | `1.0` |
 | Per-Eidolon profile schema | `schemas/spec-profile.v1.json` |
 | Envelope schema | `schemas/ecl-envelope.v1.json` |
-| Envelope template | `templates/spec.envelope.json` |
+| Envelope template | `schemas/spec.envelope.json` |
 | Hand-off contract | `eidolons-ecl/contracts/spectra-to-apivr.yaml` |
 | Required spec sections (per contract) | `stories`, `validation_gates`, `agent_hints`, `given_when_then` |
 | Default `trust_level` | `standard` |

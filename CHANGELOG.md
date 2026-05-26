@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [4.5.1] — 2026-05-26 — SPEC.md text sweep
+
+### Fixed
+- `docs/spectra-methodology/SPEC.md`: corrected stale envelope template path in
+  ECL Compatibility table — `templates/spec.envelope.json` → `schemas/spec.envelope.json`
+  (file is installed to the consumer target's `schemas/` directory since v4.5.0;
+  prose reference was not updated at that time).
+
 ## [4.5.0] — 2026-05-26 — EIIS v1.4 canonical inventory
 
 ### Changed
