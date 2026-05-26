@@ -49,8 +49,7 @@ At the start of every session, check for `.spectra/setup/spectra-conventions.md`
 | Need | Load |
 |------|------|
 | Full cognitive architecture | `SPEC.md` (sibling of this file) |
-| Scoring rubrics + matrices | `scoring.md` |
-| Output formats per phase | `templates.md` |
+| Scoring rubrics + matrices | `templates/scoring.md` |
+| Output formats per phase | `templates/catalog.md` |
 | Quick routing card | `skills/planning.md` |
 | Project vocabulary (if fitted) | `.spectra/setup/spectra-conventions.md` (in consumer project root, not this Eidolon target) |
-| Research citations | `research/THEORY.md`, `research/RETROFIT.md` |

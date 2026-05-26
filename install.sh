@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# install.sh — SPECTRA EIIS v1.3 Installer
+# install.sh — SPECTRA EIIS v1.4 Installer
 #
-# Installs SPECTRA into a consumer project following the EIIS v1.2 interface
+# Installs SPECTRA into a consumer project following the EIIS v1.4 interface
 # contract. Writes methodology files to a target directory, creates per-host
 # dispatch files (claude-code, copilot, cursor, opencode, codex), and emits
 # install.manifest.json.
@@ -22,12 +22,12 @@
 #   --version             Print Eidolon version
 #   -h, --help            Show help
 #
-# SPECTRA v4.4.1+ — https://github.com/Rynaro/SPECTRA
+# SPECTRA v4.5.0+ — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.4.1"
+readonly EIDOLON_VERSION="4.5.0"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -38,7 +38,7 @@ for _arg in "$@"; do
       cat <<EOF
 Usage: bash install.sh [OPTIONS]
 
-Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.3).
+Installs SPECTRA v${EIDOLON_VERSION} into a consumer project (EIIS v1.4).
 
 Options:
   --target DIR          Target install dir (default: ./.eidolons/spectra)
@@ -72,12 +72,18 @@ readonly EIDOLON_NAME="spectra"
 readonly METHODOLOGY="SPECTRA"
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-# Legacy v1.2-era artefacts swept by cleanup_legacy_v1_2 on upgrade.
+# Legacy artefacts swept by cleanup_legacy_v1_2 on upgrade.
+# v1.4: adds scoring.md and templates.md (moved under templates/ in v4.5.0).
 # Bash 3.2 compatible: indexed arrays only.
-LEGACY_SPEC_FILES=( "SPECTRA.md" )
+LEGACY_SPEC_FILES=( "SPECTRA.md" "scoring.md" "templates.md" )
 LEGACY_SKILL_DIRS=( \
   "planning" \
 )
+# v1.4: non-whitelisted directories previously installed (research, tools, commands).
+# cleanup_legacy_v1_2 handles skill dirs but not arbitrary top-level dirs;
+# canonical_inventory_sweep (invoked at install-end) is the normative gate.
+# We declare them here for reference; the belt-and-braces rm -rf below handles early sweep.
+LEGACY_EXTRA_DIRS=( "research" "tools" "commands" )
 
 # ECL version emitted by this Eidolon — tolerate absence for older tarballs.
 ECL_VERSION_EMITTED=""
@@ -89,7 +95,7 @@ fi
 readonly SRC_AGENT="${SCRIPT_DIR}/agent.md"
 readonly SRC_SPEC="${SCRIPT_DIR}/docs/spectra-methodology/SPEC.md"
 readonly SRC_SCORING="${SCRIPT_DIR}/docs/spectra-methodology/scoring.md"
-readonly SRC_TEMPLATES="${SCRIPT_DIR}/docs/spectra-methodology/templates.md"
+readonly SRC_TEMPLATES="${SCRIPT_DIR}/docs/spectra-methodology/catalog.md"
 readonly SRC_PLANNING_ARTIFACT="${SCRIPT_DIR}/templates/planning-artifact.md"
 readonly SRC_SKILLS_DIR="${SCRIPT_DIR}/skills"
 readonly SRC_ECL_VERSION="${SCRIPT_DIR}/ECL_VERSION"
@@ -206,26 +212,29 @@ sha256_of() {
 
 # cleanup_legacy_v1_2 <target>
 #
-# Sweep legacy v1.2-era artefacts left behind by prior installs.
+# Sweep legacy artefacts left behind by prior installs.
 # Called exactly once, early in the install sequence, BEFORE any new content
 # is written under <target>. Idempotent: no-op when no legacy file exists.
 #
-# Reads two top-of-file arrays:
+# Reads top-of-file arrays:
 #   LEGACY_SPEC_FILES  — basenames to rm -f at "<target>/<basename>"
 #   LEGACY_SKILL_DIRS  — skill names to rm -rf at "<target>/skills/<name>"
+#   LEGACY_EXTRA_DIRS  — top-level dirs to rm -rf at "<target>/<dir>"
 #
-# Both arrays are declared per-Eidolon and MAY be empty (in which case
+# All arrays are declared per-Eidolon and MAY be empty (in which case
 # the corresponding loop is a no-op). Never reads/writes outside <target>.
 cleanup_legacy_v1_2() {
   local target="$1"
   local legacy
   local legacy_skill_dir
+  local legacy_dir
 
   if [ -z "${target}" ] || [ ! -d "${target}" ]; then
     return 0
   fi
 
-  # Sweep legacy spec filenames (e.g. SPECTRA.md from pre-v1.3 installs)
+  # Sweep legacy spec filenames (e.g. SPECTRA.md from pre-v1.3 installs;
+  # scoring.md and templates.md at root from pre-v4.5.0 installs).
   for legacy in "${LEGACY_SPEC_FILES[@]}"; do
     if [ -n "${legacy}" ] && [ -f "${target}/${legacy}" ]; then
       rm -f "${target}/${legacy}"
@@ -241,11 +250,70 @@ cleanup_legacy_v1_2() {
     fi
   done
 
+  # Sweep non-whitelisted top-level dirs installed by pre-v4.5.0 releases
+  # (research/, tools/, commands/ — no longer in the §1.9.1 canonical whitelist).
+  for legacy_dir in "${LEGACY_EXTRA_DIRS[@]+"${LEGACY_EXTRA_DIRS[@]}"}"; do
+    if [ -n "${legacy_dir}" ] && [ -d "${target}/${legacy_dir}" ]; then
+      rm -rf "${target}/${legacy_dir}"
+      log_info "swept non-whitelisted dir: ${target}/${legacy_dir}"
+    fi
+  done
+
+  return 0
+}
+
+# canonical_inventory_sweep <target>
+#
+# Remove every file under <target>/ that is not present in the in-memory
+# allow-set FILES_WRITTEN_PATHS. Manifest-driven: runs AFTER all writes,
+# BEFORE install.manifest.json is finalized. Replaces per-Eidolon ad-hoc
+# cleanup with a contract-based sweep (EIIS v1.4 §6.X).
+#
+# Bash 3.2 compatible: indexed array, no associative arrays, no readarray.
+# Idempotent: re-running on a clean target is a no-op.
+canonical_inventory_sweep() {
+  local target="$1"
+  local file_rel
+  local found
+  local known
+
+  if [ -z "${target}" ] || [ ! -d "${target}" ]; then
+    return 0
+  fi
+
+  # Walk every file under <target>/; for each, test membership in the allow-set.
+  find "${target}" -type f -print0 | while IFS= read -r -d '' file; do
+    # Compute the target-relative path (strip "${target}/" prefix).
+    file_rel="${file#${target}/}"
+
+    found=0
+    for known in "${FILES_WRITTEN_PATHS[@]+"${FILES_WRITTEN_PATHS[@]}"}"; do
+      # FILES_WRITTEN_PATHS entries are consumer-relative
+      # (e.g. ".eidolons/spectra/SPEC.md"). Compare by suffix.
+      case "${known}" in
+        *"/${file_rel}"|"${file_rel}")
+          found=1
+          break
+          ;;
+      esac
+    done
+
+    if [ "${found}" -eq 0 ]; then
+      rm -f "${file}"
+      log_info "swept non-whitelisted file: ${file}"
+    fi
+  done
+
+  # Remove any empty directories left after the sweep.
+  find "${target}" -mindepth 1 -type d -empty -delete 2>/dev/null || true
+
   return 0
 }
 
 # Accumulate written files for manifest: "path|role|mode"
 FILES_WRITTEN=()
+# Parallel allow-set for canonical_inventory_sweep: consumer-relative paths.
+FILES_WRITTEN_PATHS=()
 HOSTS_WIRED=()
 
 # --- Copy a source file to the target directory ---
@@ -257,6 +325,7 @@ copy_file() {
   fi
   cp "$src" "$dst"
   FILES_WRITTEN+=("${dst}|${role}|created")
+  FILES_WRITTEN_PATHS+=("${dst}")
   log_ok "Wrote: ${dst}"
 }
 
@@ -273,6 +342,7 @@ write_file() {
     printf '%s\n' "$content" > "$dst"
   fi
   FILES_WRITTEN+=("${dst}|${role}|${mode}")
+  FILES_WRITTEN_PATHS+=("${dst}")
   log_ok "${mode}: ${dst}"
 }
 
@@ -350,73 +420,29 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   # Sweep legacy v1.2-era artefacts before writing any new content.
   cleanup_legacy_v1_2 "${TARGET}"
 
-  copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
+  copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "agent-profile"
   copy_file "$SRC_SPEC"              "${TARGET}/SPEC.md"                        "spec"
-  copy_file "$SRC_SCORING"           "${TARGET}/scoring.md"                     "other"
-  copy_file "$SRC_TEMPLATES"         "${TARGET}/templates.md"                   "template"
+  copy_file "$SRC_SCORING"           "${TARGET}/templates/scoring.md"           "template"
+  copy_file "$SRC_TEMPLATES"         "${TARGET}/templates/catalog.md"           "template"
   copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
 
   # ECL v1.0 emission files (opt-in — only present when ECL_VERSION exists)
   if [[ -f "$SRC_ECL_VERSION" ]]; then
-    copy_file "$SRC_ECL_VERSION"          "${TARGET}/ECL_VERSION"                          "other"
+    copy_file "$SRC_ECL_VERSION"          "${TARGET}/ECL_VERSION"                          "ecl-version"
     copy_file "$SRC_SPEC_PROFILE"         "${TARGET}/schemas/spec-profile.v1.json"         "other"
     copy_file "$SRC_ECL_ENVELOPE"         "${TARGET}/schemas/ecl-envelope.v1.json"         "other"
-    copy_file "$SRC_SPEC_ENVELOPE_TMPL"   "${TARGET}/templates/spec.envelope.json"         "template"
+    # spec.envelope.json is a JSON template — moved to schemas/ (EIIS v1.4 §1.9.1:
+    # templates/ allows only .md; schemas/ allows .json).
+    copy_file "$SRC_SPEC_ENVELOPE_TMPL"   "${TARGET}/schemas/spec.envelope.json"           "other"
   fi
 
-  # Rewrite relative research/ links in the installed SPEC.md so they
-  # resolve locally (research docs copied below) — `../research/` was valid
-  # from the source-repo `docs/spectra-methodology/` but breaks after copy.
-  if [[ "$DRY_RUN" != "true" && -f "${TARGET}/SPEC.md" ]]; then
-    sed_tmp="$(mktemp)"
-    # Portable in-place rewrite: read → transform → write
-    sed 's|](\.\./research/|](./research/|g' "${TARGET}/SPEC.md" > "$sed_tmp"
-    mv "$sed_tmp" "${TARGET}/SPEC.md"
-  fi
-
-  # Copy research docs into the installed target so the methodology is
-  # self-contained offline — no WebFetch / permission-gated network calls
-  # to resolve SPEC.md's citations.
-  if [[ "$DRY_RUN" != "true" && -d "${SCRIPT_DIR}/docs/research" ]]; then
-    mkdir -p "${TARGET}/research"
-    for _f in "${SCRIPT_DIR}/docs/research"/*.md; do
-      [[ -f "$_f" ]] || continue
-      cp "$_f" "${TARGET}/research/"
-    done
-    log_ok "Wrote: ${TARGET}/research/ (self-contained research citations)"
-    FILES_WRITTEN+=("${TARGET}/research|other|created")
-  else
-    log_dry "copy ${SCRIPT_DIR}/docs/research/*.md → ${TARGET}/research/"
-  fi
-
-  # Copy the retrofit tool tree (tools/) so the installed Eidolon can run
-  # `eidolons spectra fit` without depending on the source repo being
-  # present on disk.
-  if [[ "$DRY_RUN" != "true" && -d "${SCRIPT_DIR}/tools" ]]; then
-    mkdir -p "${TARGET}/tools"
-    cp -R "${SCRIPT_DIR}/tools/." "${TARGET}/tools/"
-    chmod +x "${TARGET}/tools/spectra-init.sh" 2>/dev/null || true
-    log_ok "Wrote: ${TARGET}/tools/ (retrofit tooling)"
-    FILES_WRITTEN+=("${TARGET}/tools|other|created")
-  else
-    log_dry "copy ${SCRIPT_DIR}/tools/ → ${TARGET}/tools/"
-  fi
-
-  # Copy per-Eidolon command scripts — consumed by the nexus CLI's generic
-  # `eidolons <eidolon> <sub>` dispatcher. Each file is a standalone bash
-  # script executed from the consumer project root.
-  if [[ "$DRY_RUN" != "true" && -d "${SCRIPT_DIR}/commands" ]]; then
-    mkdir -p "${TARGET}/commands"
-    for _f in "${SCRIPT_DIR}/commands"/*.sh; do
-      [[ -f "$_f" ]] || continue
-      cp "$_f" "${TARGET}/commands/"
-      chmod +x "${TARGET}/commands/$(basename "$_f")"
-    done
-    log_ok "Wrote: ${TARGET}/commands/ (per-Eidolon subcommands)"
-    FILES_WRITTEN+=("${TARGET}/commands|other|created")
-  else
-    log_dry "copy ${SCRIPT_DIR}/commands/ → ${TARGET}/commands/"
-  fi
+  # NOTE (v4.5.0 / EIIS v1.4): research/, tools/, and commands/ are no longer
+  # copied to the install target — those paths fall outside the §1.9.1 canonical
+  # inventory whitelist. Consumers that need the research citations or retrofit
+  # tooling should reference the SPECTRA source repo directly, or clone it locally.
+  # The LEGACY_SPEC_FILES array extended in cleanup_legacy_v1_2 will sweep any
+  # stale copies left by prior installs; the manifest-driven canonical_inventory_sweep
+  # at install-end is the normative gate (EIIS v1.4 §6.X).
 
   # --- Per-host dispatch files ---
   IFS=',' read -ra _host_list <<< "$HOSTS"
@@ -480,6 +506,7 @@ Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → 
     mkdir -p "$(dirname "${dst_src}")"
     cp "${src}" "${dst_src}"
     FILES_WRITTEN+=("${dst_src}|skill|created")
+    FILES_WRITTEN_PATHS+=("${dst_src}")
     log_ok "Wrote: ${dst_src}"
 
     # Vendor copy for claude-code host
@@ -532,6 +559,8 @@ Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → 
         [[ "$SHARED_DISPATCH" == "true" ]] && upsert_eidolon_block "CLAUDE.md" "$SHARED_BLOCK"
 
         # Subagent dispatch — authoritative when claude-code is wired
+        # Body conforms to EIIS v1.4 §4.2.6: references both agent.md and SPEC.md;
+        # no legacy filenames (SPECTRA.md); no subdir-skill paths.
         if [[ "$DRY_RUN" != "true" ]]; then
           mkdir -p ".claude/agents"
           if [[ ! -f ".claude/agents/${EIDOLON_NAME}.md" || "$FORCE" == "true" ]]; then
@@ -539,31 +568,18 @@ Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → 
 ---
 name: ${EIDOLON_NAME}
 description: "Decision-ready specifications — scoring rubrics, validation gates, GIVEN/WHEN/THEN stories."
-when_to_use: "After ATLAS has mapped the surface (or you have an equivalent brief) and you need a bounded, testable spec before implementation begins."
-tools: Read, Grep, Glob, Write
-methodology: ${METHODOLOGY}
-methodology_version: "${EIDOLON_VERSION%.*}"
-role: Planner — decision-ready specifications
-handoffs: [apivr]
+model: opus
 ---
 
-SPECTRA runs the S→P→E→C→T→R→A cycle. Given an exploration or scout
-report, it produces a spec with scoring rubrics, validation gates, and
-structured stories that downstream implementers can act on without
-ambiguity.
+You are SPECTRA. Read these two files in order at session start:
 
-## On activation
+1. \`./.eidolons/${EIDOLON_NAME}/agent.md\` — always-loaded P0 rules.
+2. \`./.eidolons/${EIDOLON_NAME}/SPEC.md\` — deep on-demand methodology spec.
 
-1. Check for \`.spectra/setup/spectra-conventions.md\` in the current project. If it exists, read it — its project vocabulary (real module names, test framework, deploy targets, naming patterns) supersedes SPECTRA's generic placeholders ("FlowObject", "Repository") throughout the rest of the cycle. If absent, continue with generic defaults; conventions are optional enrichment.
-2. Confirm the output target: every plan, spec, hypothesis, or state file you produce lands under \`.spectra/\` in this project — plans at \`.spectra/plans/\`, state at \`.spectra/state/\`, logs at \`.spectra/logs/\`. Never scatter files outside \`.spectra/\` without an explicit user request; even then, mirror a copy into \`.spectra/plans/\`.
-
-## References
-
-- \`${TARGET}/agent.md\` — P0 rules (read if deeper context is needed)
-- \`${TARGET}/SPEC.md\` — full methodology specification
-- \`${TARGET}/skills/planning.md\` — progressive-disclosure routing card
+Skills live at \`./.eidolons/${EIDOLON_NAME}/skills/<skill>.md\` (load on demand).
 AGENT
             FILES_WRITTEN+=(".claude/agents/${EIDOLON_NAME}.md|dispatch|created")
+            FILES_WRITTEN_PATHS+=(".claude/agents/${EIDOLON_NAME}.md")
             log_ok "Wrote: .claude/agents/${EIDOLON_NAME}.md"
           else
             log_info ".claude/agents/${EIDOLON_NAME}.md already exists — use --force to overwrite"
@@ -691,17 +707,6 @@ fi
 if [[ "$DRY_RUN" != "true" ]]; then
   mkdir -p "$TARGET"
 
-  # Build files_written JSON array
-  _files_json="["
-  _first=true
-  for _entry in "${FILES_WRITTEN[@]+"${FILES_WRITTEN[@]}"}"; do
-    IFS='|' read -r _fpath _frole _fmode <<< "$_entry"
-    _fsha=$(sha256_of "$_fpath" 2>/dev/null || echo "")
-    [[ "$_first" == "true" ]] && _first=false || _files_json+=","
-    _files_json+="{\"path\":\"${_fpath}\",\"sha256\":\"${_fsha}\",\"role\":\"${_frole}\",\"mode\":\"${_fmode}\"}"
-  done
-  _files_json+="]"
-
   # Build hosts_wired JSON array
   _hosts_json="["
   _first=true
@@ -739,6 +744,27 @@ if [[ "$DRY_RUN" != "true" ]]; then
   # leading './' or absolute prefix and rebuild from the eidolon name.
   _spec_file=".eidolons/${EIDOLON_NAME}/SPEC.md"
 
+  # EIIS v1.4 §6.X — manifest-driven canonical-inventory sweep.
+  # Add the manifest itself to the allow-set BEFORE sweeping so the sweep
+  # does not attempt to remove the manifest file on idempotent runs.
+  FILES_WRITTEN_PATHS+=("${MANIFEST_PATH}")
+  canonical_inventory_sweep "${TARGET}"
+
+  # Record the manifest in files_written[] so §1.7.4 is satisfied.
+  _manifest_sha=$(sha256_of "${MANIFEST_PATH}" 2>/dev/null || echo "")
+  FILES_WRITTEN+=("${MANIFEST_PATH}|manifest|created")
+
+  # Rebuild files_written JSON (now includes manifest entry added above).
+  _files_json="["
+  _first=true
+  for _entry in "${FILES_WRITTEN[@]+"${FILES_WRITTEN[@]}"}"; do
+    IFS='|' read -r _fpath _frole _fmode <<< "$_entry"
+    _fsha=$(sha256_of "$_fpath" 2>/dev/null || echo "")
+    [[ "$_first" == "true" ]] && _first=false || _files_json+=","
+    _files_json+="{\"path\":\"${_fpath}\",\"sha256\":\"${_fsha}\",\"role\":\"${_frole}\",\"mode\":\"${_fmode}\"}"
+  done
+  _files_json+="]"
+
   cat > "$MANIFEST_PATH" <<MANIFEST_EOF
 {
   "eidolon": "${EIDOLON_NAME}",
@@ -748,6 +774,7 @@ if [[ "$DRY_RUN" != "true" ]]; then
   "target": "${TARGET}",
   "ecl_version_emitted": "${ECL_VERSION_EMITTED:-}",
   "spec_file": "${_spec_file}",
+  "canonical_inventory_strict": true,
   "skills": ${_skills_json},
   "hosts_wired": ${_hosts_json},
   "files_written": ${_files_json},
