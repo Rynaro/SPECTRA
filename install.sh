@@ -22,12 +22,12 @@
 #   --version             Print Eidolon version
 #   -h, --help            Show help
 #
-# SPECTRA v4.4.0+ — https://github.com/Rynaro/SPECTRA
+# SPECTRA v4.4.1+ — https://github.com/Rynaro/SPECTRA
 # License: CC BY-SA 4.0
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.4.0"
+readonly EIDOLON_VERSION="4.4.1"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -71,6 +71,13 @@ done
 readonly EIDOLON_NAME="spectra"
 readonly METHODOLOGY="SPECTRA"
 readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Legacy v1.2-era artefacts swept by cleanup_legacy_v1_2 on upgrade.
+# Bash 3.2 compatible: indexed arrays only.
+LEGACY_SPEC_FILES=( "SPECTRA.md" )
+LEGACY_SKILL_DIRS=( \
+  "planning" \
+)
 
 # ECL version emitted by this Eidolon — tolerate absence for older tarballs.
 ECL_VERSION_EMITTED=""
@@ -197,6 +204,46 @@ sha256_of() {
   fi
 }
 
+# cleanup_legacy_v1_2 <target>
+#
+# Sweep legacy v1.2-era artefacts left behind by prior installs.
+# Called exactly once, early in the install sequence, BEFORE any new content
+# is written under <target>. Idempotent: no-op when no legacy file exists.
+#
+# Reads two top-of-file arrays:
+#   LEGACY_SPEC_FILES  — basenames to rm -f at "<target>/<basename>"
+#   LEGACY_SKILL_DIRS  — skill names to rm -rf at "<target>/skills/<name>"
+#
+# Both arrays are declared per-Eidolon and MAY be empty (in which case
+# the corresponding loop is a no-op). Never reads/writes outside <target>.
+cleanup_legacy_v1_2() {
+  local target="$1"
+  local legacy
+  local legacy_skill_dir
+
+  if [ -z "${target}" ] || [ ! -d "${target}" ]; then
+    return 0
+  fi
+
+  # Sweep legacy spec filenames (e.g. SPECTRA.md from pre-v1.3 installs)
+  for legacy in "${LEGACY_SPEC_FILES[@]}"; do
+    if [ -n "${legacy}" ] && [ -f "${target}/${legacy}" ]; then
+      rm -f "${target}/${legacy}"
+      log_info "swept legacy spec file: ${target}/${legacy}"
+    fi
+  done
+
+  # Sweep legacy subdir-style skills (e.g. skills/planning/SKILL.md)
+  for legacy_skill_dir in "${LEGACY_SKILL_DIRS[@]}"; do
+    if [ -n "${legacy_skill_dir}" ] && [ -d "${target}/skills/${legacy_skill_dir}" ]; then
+      rm -rf "${target}/skills/${legacy_skill_dir}"
+      log_info "swept legacy skill subdir: ${target}/skills/${legacy_skill_dir}"
+    fi
+  done
+
+  return 0
+}
+
 # Accumulate written files for manifest: "path|role|mode"
 FILES_WRITTEN=()
 HOSTS_WIRED=()
@@ -299,6 +346,9 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   else
     log_dry "mkdir -p ${TARGET} ${TARGET}/templates ${TARGET}/schemas"
   fi
+
+  # Sweep legacy v1.2-era artefacts before writing any new content.
+  cleanup_legacy_v1_2 "${TARGET}"
 
   copy_file "$SRC_AGENT"             "${TARGET}/agent.md"                       "entry-point"
   copy_file "$SRC_SPEC"              "${TARGET}/SPEC.md"                        "spec"
