@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [4.5.2] — 2026-05-27 — canary-missions v1.13.0 DSL migration
+
+- Patch: migrate evals/canary-missions.md to nexus v1.13.0 DSL format (smoke-default + dual-format missions). Legacy free-form catalog preserved.
+
 ## [4.5.1] — 2026-05-26 — SPEC.md text sweep
 
 ### Fixed

@@ -1,7 +1,75 @@
-# SPECTRA — Canary Missions
+# Canary Missions — SPECTRA
 
-Smoke tests to verify SPECTRA is installed and operating correctly.
-Run one or more after installation.
+> v1.13.0 DSL-format missions for `eidolons canary spectra`. The legacy
+> free-form catalog is preserved under "Legacy mission catalog (pre-DSL)"
+> below for reference.
+
+---
+
+## Mission: smoke-default
+
+### Prompt
+
+Using the SPECTRA methodology, plan the following feature:
+
+> Add a health-check endpoint to a REST API that returns service status and version.
+
+Assume: Node.js / TypeScript, Express, no existing health check, no authentication required. The request is unambiguous; CLARIFY should be brief or skipped.
+
+Walk through the cycle (CLARIFY → Scope → Pattern → Explore → Construct → Test → Refine → Assemble) and produce the final dual-format specification artefact (markdown body + YAML companion block). Do NOT write implementation code — specification only.
+
+### Expected output shape
+
+The response opens with a brief CLARIFY note (questions or "unambiguous → skipped"), then a Scope section with a complexity score (1-12) and request-type tag, then a Pattern section that names Express conventions, then Explore with at least two hypotheses, then Construct with the proposed shape, then a Test section with at least one GIVEN/WHEN/THEN story, then Assemble with the final dual-format artefact. The markdown body is followed by a YAML block companion. No JS / TS implementation code is present.
+
+### Validation criteria
+
+- MUST contain heading: `## Scope`
+- MUST contain phrase: `complexity`
+- MUST contain phrase: `GIVEN`
+- MUST contain phrase: `WHEN`
+- MUST contain phrase: `THEN`
+- MUST contain phrase: `\`\`\`yaml`
+- SHOULD contain phrase: `READ-ONLY`
+- SHOULD contain phrase: `hypothes`
+- SHOULD have token count between 1200 and 4000
+
+---
+
+## Mission: dual-format
+
+### Prompt
+
+Using SPECTRA, plan this change against an existing brownfield codebase:
+
+> Extend the user authentication system to support multi-factor authentication via TOTP.
+
+Assume: Ruby on Rails, Devise gem, PostgreSQL, existing RSpec suite, ~50k LOC.
+
+Produce the dual-format SPECTRA artefact. The Test phase MUST include a YAML risk register listing at least one P0, P1, or P2 item. The Construct phase MUST tag identified risks with `P0`, `P1`, or `P2` markers.
+
+### Expected output shape
+
+A SPECTRA artefact whose final Assemble section contains both a markdown body and a YAML block. The markdown body has Scope, Pattern, Explore, Construct, Test, and Assemble sections. Explore lists at least three hypotheses with comparative scoring. Construct includes P0/P1/P2 risk tags. The YAML block contains at least: a Scope summary, a hypothesis array, and a risk register array with severity entries. No Ruby implementation code is present.
+
+### Validation criteria
+
+- MUST contain heading: `## Scope`
+- MUST contain phrase: `P0|P1|P2`
+- MUST contain phrase: `\`\`\`yaml`
+- MUST contain phrase: `risk`
+- MUST mention paths: `Gemfile`
+- SHOULD contain phrase: `Devise`
+- SHOULD contain phrase: `hypothes`
+- SHOULD have token count between 1500 and 5000
+
+---
+
+## Legacy mission catalog (pre-DSL)
+
+> The original three free-form missions ("Simple Feature Spec", "Brownfield
+> Analysis", "Ambiguous Request") are preserved below as historical reference.
+> The v1.13.0 validator parses only the `## Mission: <id>` blocks above.
 
 ---
 
