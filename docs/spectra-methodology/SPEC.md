@@ -336,6 +336,34 @@ SPECTRA v4.3.0 adopts **ECL v1.0** (Eidolons Communication Layer) for envelope e
 
 ---
 
+## §9 Memory protocol (CRYSTALIUM)
+
+SPECTRA integrates with CRYSTALIUM to build persistent, cross-session planning
+intelligence. The pipeline is:
+
+| Hook | Phase | Call |
+|------|-------|------|
+| **Recall** | Mission intake (before CLARIFY) | `mcp__crystalium__recall(scope, query, k=5, layers=[semantic,episodic,procedural])` — surface prior specs, decisions, and patterns before any phase work. |
+| **Ingest** | A (Assemble) | `mcp__crystalium__ingest(envelope, payload)` — persist the spec + ECL envelope at T1. Primary persist path; `from.eidolon=spectra` drives tier derivation. |
+| **Commit** | Mid-cycle (optional) | `mcp__crystalium__commit(layer=episodic, payload, provenance={author_agent:"spectra",...})` — direct episodic write for notable observations not worth a handoff. `author_agent` MUST be `"spectra"`. |
+| **Session end** | A (after ingest) | `mcp__crystalium__session_end()` — Dream trigger; call once per planning session completion. |
+
+**Trust tier:** T1 for all SPECTRA calls (set process-wide by
+`CRYSTALIUM_CALLER_TIER=T1` in the shared `.mcp.json`).
+
+**Read-only invariant:** the read-only constraint applies to the *codebase*.
+Calling `mcp__crystalium__*` memory tools is explicitly permitted.
+
+**Graceful skip:** if `mcp__crystalium__*` tools are unavailable (CRYSTALIUM not
+installed), all four hooks are silent no-ops. SPECTRA is EIIS-standalone-conformant
+and works without CRYSTALIUM.
+
+For the full tool surface (8 tools), layer×tier matrix, Dream consolidation
+knobs, and `plan_checkpoint` details, see the cortex deep table:
+`methodology/cortex/memory-protocol.md` (in the Eidolons nexus).
+
+---
+
 ## Project Conventions (optional)
 
 `.spectra/setup/spectra-conventions.md` is SPECTRA's project-adaptation surface. When present, it maps the generic methodology concepts to the project's actual vocabulary — file paths, naming conventions, test framework references, deployment patterns. It's produced by a one-time in-project fit pass (run from the consumer host via a retrofit tool) and then edited by humans if the LLM-generated mapping needs correction.

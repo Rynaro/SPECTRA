@@ -2,6 +2,33 @@
 
 ## [Unreleased]
 
+## [4.6.0] — 2026-06-02 — CRYSTALIUM memory pipeline
+
+### Added
+- **Memory pre-flight (recall)** in `agent.md`: before any phase work, call
+  `mcp__crystalium__recall(scope, query, k=5, layers=[semantic,episodic,procedural])`
+  to surface prior specs, decisions, and patterns. Fires at mission intake, before
+  CLARIFY.
+- **Ingest spine** in `skills/planning.md` Assemble phase: after the ECL spec
+  envelope is validated, call `mcp__crystalium__ingest(envelope, payload)` to
+  persist the spec at T1 (`from.eidolon=spectra`). Optional mid-cycle
+  `mcp__crystalium__commit(layer=episodic, provenance={author_agent:"spectra",...})`
+  for notable observations. `mcp__crystalium__session_end()` at session completion.
+- **Graceful-skip** contract in every touched skill: if `mcp__crystalium__*`
+  tools are unavailable, all hooks are silent no-ops — SPECTRA remains
+  EIIS-standalone-conformant.
+- **`SPEC.md §9` Memory protocol (CRYSTALIUM)**: concise recall→ingest→session_end
+  table, trust tier note, graceful-skip guarantee, pointer to
+  `methodology/cortex/memory-protocol.md` in the Eidolons nexus.
+- **Memory round-trip eval** in `evals/canary-missions.md`: asserts recall at
+  mission intake, ingest at Assemble with `author_agent=spectra` + T1, and
+  graceful-skip when CRYSTALIUM is absent.
+
+### Notes
+- `ECL_VERSION` (2.0) and `EIIS_VERSION` (1.4) unchanged — memory pipeline is
+  additive; no envelope-shape or install-contract change.
+- `EIDOLON_VERSION` bumped `4.5.2` → `4.6.0` (MINOR — additive feature).
+
 ## [4.5.2] — 2026-05-27 — canary-missions v1.13.0 DSL migration
 
 - Patch: migrate evals/canary-missions.md to nexus v1.13.0 DSL format (smoke-default + dual-format missions). Legacy free-form catalog preserved.
