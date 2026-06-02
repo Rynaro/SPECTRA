@@ -65,6 +65,50 @@ A SPECTRA artefact whose final Assemble section contains both a markdown body an
 
 ---
 
+## Mission: memory-round-trip
+
+### Prompt
+
+Using the SPECTRA methodology, plan the following feature:
+
+> Add a rate-limiting middleware to a REST API to cap requests per IP to 100/min.
+
+Assume: Node.js / TypeScript, Express, no existing rate limiting, Redis available.
+
+Before starting CLARIFY, demonstrate the memory pre-flight: call
+`mcp__crystalium__recall` with `scope={project: "test-project", agent_class_visibility: "spectra"}`,
+`query="rate limiting middleware Node.js Express Redis"`, `k=5`, `layers=["semantic","episodic","procedural"]`.
+After producing the final spec Markdown + YAML artefact (Assemble phase), emit the
+ECL envelope skeleton (fill `from.eidolon: spectra`, `to.eidolon: apivr`,
+`performative: PROPOSE`, `author_agent: spectra`) then call
+`mcp__crystalium__ingest(envelope=<envelope>, payload=<spec markdown>)`.
+Finally call `mcp__crystalium__session_end()`.
+
+If `mcp__crystalium__*` tools are not available, proceed without them and note
+"CRYSTALIUM absent — memory hooks skipped" at each would-be call site.
+
+### Expected output shape
+
+The response begins with a `mcp__crystalium__recall` call (or the graceful-skip
+note). It then runs the full SPECTRA cycle and emits a dual-format spec artefact.
+After Assemble, it shows a `mcp__crystalium__ingest` call (or graceful-skip note)
+with `author_agent: spectra` in the provenance, followed by
+`mcp__crystalium__session_end()` (or graceful-skip note).
+
+### Validation criteria
+
+- MUST contain phrase: `mcp__crystalium__recall` OR `CRYSTALIUM absent`
+- MUST contain phrase: `mcp__crystalium__ingest` OR `CRYSTALIUM absent`
+- MUST contain phrase: `mcp__crystalium__session_end` OR `CRYSTALIUM absent`
+- MUST contain phrase: `author_agent` OR `CRYSTALIUM absent`
+- MUST contain phrase: `spectra` (in provenance context)
+- MUST contain phrase: `\`\`\`yaml`
+- MUST contain phrase: `GIVEN`
+- SHOULD contain phrase: `T1`
+- SHOULD contain phrase: `graceful` OR `CRYSTALIUM absent`
+
+---
+
 ## Legacy mission catalog (pre-DSL)
 
 > The original three free-form missions ("Simple Feature Spec", "Brownfield
