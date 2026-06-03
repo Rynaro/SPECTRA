@@ -2,6 +2,42 @@
 
 ## [Unreleased]
 
+### Added
+- **DISCOVER phase (pre-CLARIFY, open-ended elicitation)** — new flat skill
+  `skills/discover.md` + `SPEC.md` "## DISCOVER" section. A bounded, read-only
+  requirements-discovery sub-mode that elicits stakeholders, latent goals, success
+  metrics, hard constraints, and non-goals BEFORE CLARIFY, for under-GOALED
+  (IDEA/STRATEGIC) requests where the objective itself is unspecified — distinct
+  from CLARIFY, which disambiguates an already-known goal. Emits `[GAP]` markers
+  for each unknown and hands an elicitation summary to CLARIFY; never loops, never
+  plans (D2/D5). Targets MAST's ~43.8% system-design failure category (R3-01) and
+  the elicitation-collapse failure mode (R3-11, HiddenBench).
+- **Parallel Spec Mode (TRANCE — G3 evaluator-optimizer)** — new flat skill
+  `skills/parallel-spec.md` + `SPEC.md` "## Parallel Spec Mode" section.
+  Operationalizes the named-but-unimplemented G3 TRANCE form as a bounded,
+  read-only GENERATE (2-4 perspective-diverse clean-context branches, cap 4) →
+  EVALUATE (7-dim rubric with R3-09 bias hardening: authoring-identity strip,
+  presentation-order rotation, length normalization, deterministic-check anchor) →
+  JUDGE-MERGE (one synthesized spec, per-dimension `[DECISION]` provenance) →
+  TERMINATE (confidence ≥85% OR hard cap 3 iterations, else `[GAP]` escalation)
+  cycle that WRAPS the standard S→P→E→C→T→R→A cycle. TRANCE-gated — never the
+  default; standard tier runs the single-pass cycle. No worktree isolation
+  (read-only ⇒ safe parallel, R1-01). Anchors: R3-04, R3-06, R3-09, R1-03, C1, D5.
+- **DESIGN-RATIONALE** DR-10 (DISCOVER) and DR-11 (parallel evaluator-optimizer),
+  mapping each lever to its research evidence and rejected alternatives.
+- **Canary missions** `discovery-elicitation` and `parallel-spec-trance` in
+  `evals/canary-missions.md`.
+
+### Changed
+- `install.sh` manifest builder registers the two new flat skills
+  (`_add_skill "discover"`, `_add_skill "parallel-spec"`) alongside `planning`.
+
+### Notes
+- `EIIS_VERSION` (1.4) and `ECL_VERSION` (2.0) unchanged — both levers are
+  additive methodology; no install-contract or envelope-shape change.
+- `agent.md` untouched (well under the ≤1000-token P0 gate); both new skills load
+  on demand. `EIDOLON_VERSION` bump intent 4.6.0 → 4.7.0 (MINOR).
+
 ## [4.6.0] — 2026-06-02 — CRYSTALIUM memory pipeline
 
 ### Added

@@ -109,6 +109,82 @@ with `author_agent: spectra` in the provenance, followed by
 
 ---
 
+## Mission: discovery-elicitation
+
+### Prompt
+
+Using the SPECTRA methodology, plan the following:
+
+> We need better observability for our platform.
+
+This request is **under-GOALED** — the objective itself is unspecified (no metric, no
+scope, no named stakeholder, no platform definition). Before CLARIFY, run the DISCOVER
+sub-mode: elicit stakeholders, the latent goal, success metrics, hard constraints, and
+non-goals; emit `[GAP]` markers for each unknown; produce an elicitation summary and
+hand it to CLARIFY. Do NOT jump straight to a Scope artifact or a plan. Do NOT write
+implementation code.
+
+### Expected output shape
+
+The response opens with a `## DISCOVER` section that elicits stakeholders, latent
+goal, success metrics, hard constraints, and non-goals, with `[GAP]` markers for the
+unknowns and a coverage note. DISCOVER produces an elicitation summary (NOT a plan)
+and explicitly hands off to CLARIFY. No Scope artifact, story hierarchy, or
+implementation code appears before discovery completes.
+
+### Validation criteria
+
+- MUST contain phrase: `DISCOVER`
+- MUST contain phrase: `[GAP]`
+- MUST contain phrase: `stakeholder`
+- MUST contain phrase: `CLARIFY`
+- MUST contain phrase: `non-goal` OR `Non-goal` OR `out of scope`
+- SHOULD contain phrase: `success metric` OR `baseline`
+- SHOULD contain phrase: `latent` OR `elicit`
+- SHOULD NOT contain heading: `## Construct`
+
+---
+
+## Mission: parallel-spec-trance
+
+### Prompt
+
+Using SPECTRA at **TRANCE tier** (assume the cortex has authorized TRANCE for this
+high-stakes, high-complexity request), plan the following:
+
+> Design the cross-service migration to split a monolithic order-processing service
+> into independent inventory, payment, and fulfilment services with a new event bus.
+
+Assume: complexity 10-12, multi-service STRATEGIC change, high rework risk. Because
+TRANCE is authorized, run the **Parallel Spec Mode (G3 evaluator-optimizer)**: GENERATE
+≥2 perspective-diverse candidate specs in clean-context branches, EVALUATE them with
+the bias-hardened judge (note the mitigations applied), JUDGE-MERGE into one spec with
+per-dimension `[DECISION]` provenance, and TERMINATE at the confidence gate or within
+the 3-iteration cap. Do NOT write implementation code.
+
+### Expected output shape
+
+The response shows ≥2 perspective-diverse candidate specs (e.g. conservative,
+pattern-leveraging, innovative), an EVALUATE step that explicitly notes the
+LLM-as-judge bias mitigations (identity stripped / order rotated / length-normalized /
+deterministic-anchor), a JUDGE-MERGE step that synthesizes ONE spec with per-dimension
+`[DECISION]` provenance and a Rejected-Alternatives section, and a termination note at
+the confidence gate or ≤3 iterations. The final output is a single dual-format spec.
+
+### Validation criteria
+
+- MUST contain phrase: `GENERATE` OR `candidate spec`
+- MUST contain phrase: `[DECISION]`
+- MUST contain phrase: `JUDGE-MERGE` OR `judge-merge`
+- MUST contain phrase: `Rejected Alternatives` OR `rejected`
+- MUST contain phrase: `bias` OR `identity` OR `rotate`
+- MUST contain phrase: `\`\`\`yaml`
+- SHOULD contain phrase: `TRANCE`
+- SHOULD contain phrase: `cap 3` OR `3 iterations` OR `confidence`
+- SHOULD contain phrase: `worktree` OR `read-only`
+
+---
+
 ## Legacy mission catalog (pre-DSL)
 
 > The original three free-form missions ("Simple Feature Spec", "Brownfield
