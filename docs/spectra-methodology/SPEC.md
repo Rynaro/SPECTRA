@@ -21,6 +21,44 @@ SPECTRA produces plans — never code. Output is always dual-format: human-reada
 
 ---
 
+## DISCOVER (pre-CLARIFY, open-ended elicitation)
+
+**Trigger:** When the request's **GOAL itself is underspecified** — `IDEA` or
+`STRATEGIC` intent, or any request where the objective (not merely the spec details)
+is unknown or latent. **Skip** when the goal is already clear; go straight to CLARIFY.
+
+**Purpose:** Elicit latent goals, stakeholders, success criteria, and unstated
+constraints BEFORE disambiguation. CLARIFY disambiguates a *known* goal via ≤3
+plan-shape questions; DISCOVER discovers *what the goal even is*. Specification /
+system-design is the dominant multi-agent failure category (~43.8% of failures);
+multi-agent systems collapse toward ~30% accuracy when latent stakeholder knowledge
+is never actively elicited. CLARIFY's ≤3-question contract is structurally
+incompatible with this open-ended discovery — hence a distinct pre-phase.
+
+**DISCOVER vs CLARIFY boundary:**
+
+| | DISCOVER | CLARIFY |
+|---|---|---|
+| Precondition | Goal unknown / latent | Goal known; details ambiguous |
+| Intent types | `IDEA`, `STRATEGIC` | `REQUEST`, `CHANGE`, `BUG_SPEC` |
+| Output | Elicitation summary → CLARIFY | WHO/WHAT/WHY/CONSTRAINTS → Scope |
+
+**Protocol (bounded, read-only) — surface, never assume:**
+
+1. **Stakeholders** — requester, affected parties, approval chain. `[GAP]` per unknown.
+2. **Latent goal** — the underlying outcome / job-to-be-done, distinct from the surface ask.
+3. **Success metrics** — measurable criterion + current baseline. `[GAP]` when none exists.
+4. **Hard constraints** — budget, deadline, stack lock-in, compliance, platform.
+5. **Non-goals** — what is explicitly OUT of scope (surfaced early to prevent creep).
+
+**Bound (D5):** DISCOVER is single-pass elicitation + synthesis, NOT an interactive
+multi-turn interview loop. Produce ONE elicitation summary; if coverage is low (≥2 of
+5 axes are unresolved `[GAP]`s), **escalate to the human** rather than fabricate
+goals. DISCOVER NEVER produces a plan and NEVER writes code (D2) — it hands its
+summary to CLARIFY. See `skills/discover.md` and DESIGN-RATIONALE.md DR-10.
+
+---
+
 ## CLARIFY
 
 **Trigger:** Every new request.
@@ -183,6 +221,52 @@ Cycle 1 → all ≥3 | Cycle 2 → all ≥4 | Cycle 3 → all ≥4 or diminishin
 | <50% | ESCALATE | Hand to human with gap analysis |
 
 Factors (25% each): Pattern match, Requirement clarity, Decomposition stability (≥70% self-consistency), Constraint compliance.
+
+---
+
+## Parallel Spec Mode (TRANCE — G3 evaluator-optimizer)
+
+**TRANCE-GATED — never the default.** This mode **wraps** the standard
+S→P→E→C→T→R→A cycle; it does NOT replace it. At standard tier, run the single-pass
+cycle. Activate ONLY when the cortex authorizes TRANCE (BOTH complexity AND stakes
+flags hold — e.g. complexity 10-12 STRATEGIC/CHANGE, multi-service architecture,
+high-rework-risk system design). It operationalizes the G3 form named in the nexus
+trance-matrix ("Generator + evaluator + termination gate; cap 3 iterations").
+
+**Read-vs-write safety:** SPECTRA is READ-ONLY in every phase (D2), so the parallel
+generator branches are the explicitly-SAFE parallel-READ case — **no worktree
+isolation required** (distinct from APIVR-Δ's parallel-WRITE, which needs it).
+
+**Cycle: GENERATE → EVALUATE → JUDGE-MERGE → TERMINATE**
+
+1. **GENERATE** — Fan out **2-4 clean-context generator branches** (default 3, hard
+   cap 4) from the SAME Scope+Pattern context, each with a DIFFERENT perspective
+   (conservative / pattern-leveraging / innovative / optionally risk-minimizing).
+   Perspective diversity is deliberate, not naive N-identical sampling — quality
+   dominates diversity, so cap at 3-4 high-quality branches (cost-ceiling C1 ≤5,
+   capped 4 here since spec generation is expensive). Clean-context subagents prevent
+   self-conditioning / trajectory contamination. Each branch reuses the **Explore (E)**
+   hypothesis machinery but emits a full candidate draft spec.
+2. **EVALUATE** — One evaluator scores every candidate on the 7-dimension Explore
+   rubric (`scoring.md`) with EXPLICIT LLM-as-judge bias mitigation: **strip the
+   authoring-branch identity** (counter self-preference), **rotate presentation
+   order** (counter position bias), **length-normalize** (counter verbosity bias),
+   and **anchor on the deterministic Test-phase checks** (structural / dependency /
+   constraint layers) over pure LLM judgment. Record the mitigations applied so the
+   evaluation is auditable.
+3. **JUDGE-MERGE** — Synthesize ONE spec by taking the highest-scoring approach per
+   dimension; record which candidate won each dimension via `[DECISION]` markers
+   (per-dimension provenance), and carry every rejected candidate's rationale into
+   **Rejected Alternatives** (E-phase step 6). This is the mandatory aggregation.
+4. **TERMINATE** — Stop at merged-spec confidence **≥85%** (Assemble gate) OR the
+   **hard cap of 3** iterations, whichever first. The cap is inviolable. On
+   non-convergence, emit a `[GAP]`/`[BLOCKED]` gap report and escalate — never loop
+   past the cap (this is the bounded **Refine (R)** discipline applied across branches).
+
+The merged spec flows through the normal Assemble gate and ECL envelope emission
+unchanged — downstream APIVR-Δ sees one spec + one envelope exactly as today, so the
+parallel mode is invisible at the hand-off boundary. See `skills/parallel-spec.md`
+and DESIGN-RATIONALE.md DR-11.
 
 ---
 
@@ -374,4 +458,4 @@ The file lives at `.spectra/setup/spectra-conventions.md` and nowhere else — i
 
 ---
 
-*SPECTRA v4.2.0 — Strategic Specification through Deliberate Reasoning*
+*SPECTRA v4.7.0 — Strategic Specification through Deliberate Reasoning*

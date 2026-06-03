@@ -5,7 +5,7 @@ when_to_use: "After ATLAS has mapped the surface (or you have an equivalent brie
 model: opus
 tools: Read, Grep, Glob, Write
 methodology: SPECTRA
-methodology_version: "4.5.0"
+methodology_version: "4.7.0"
 role: "Planner — decision-ready specifications"
 handoffs: [apivr, idg, atlas]
 ---

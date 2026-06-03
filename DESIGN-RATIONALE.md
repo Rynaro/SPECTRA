@@ -160,4 +160,83 @@ hand-off contract at `eidolons-ecl/contracts/spectra-to-apivr.yaml`.
 
 ---
 
-*SPECTRA v4.3.0 — CC BY-SA 4.0*
+## DR-10 — DISCOVER Phase: Open-Ended Elicitation Before Disambiguation
+
+**Decision:** Add a pre-CLARIFY DISCOVER sub-mode that performs open-ended
+requirements / stakeholder / goal elicitation when the GOAL itself is underspecified
+(`IDEA` / `STRATEGIC` intent). DISCOVER produces a bounded, read-only elicitation
+summary (stakeholders, latent goals, success metrics, hard constraints, non-goals)
+with `[GAP]` markers for each unknown, then hands that summary to CLARIFY. It never
+plans, never loops, and escalates to the human at low coverage.
+
+**Why:** SPECTRA's only ambiguity-reduction surface today is CLARIFY, which
+*disambiguates an already-known goal* via ≤3 plan-shape questions. It has no
+open-ended discovery of latent goals, stakeholders, or success criteria. This is the
+single biggest in-repo capability cap: specification / system-design is the dominant
+multi-agent failure category, and multi-agent systems collapse toward ~30% accuracy
+when latent stakeholder knowledge is never actively elicited. CLARIFY's ≤3-question
+plan-shape contract is structurally incompatible with open-ended goal elicitation, so
+folding discovery into CLARIFY would either skip discovery or overflow the 3-question
+bound — hence a distinct, bounded pre-phase.
+
+**Rejected alternative:** *Fold discovery into CLARIFY* — rejected because CLARIFY's
+≤3-question plan-shape contract assumes the goal is known; open-ended goal elicitation
+needs a different (unbounded-questions-but-single-pass) shape and a different trigger
+(`IDEA`/`STRATEGIC` vs `REQUEST`/`CHANGE`).
+
+**Evidence:** R3-01 (MAST — ~43.8% system-design / specification failures, the
+dominant MAS failure category); R3-11 (HiddenBench — elicitation failure: MAS
+collapse to ~30% when latent knowledge is not actively elicited); D2 (SPECTRA plans,
+never implements — DISCOVER stays read-only); D5 (bounded — elicitation summary +
+`[GAP]` escalation, no unbounded interview loop); D7 (`[GAP]` markers per unknown).
+
+**Scope note:** True interactive multi-turn stakeholder interviewing requires an
+interactive runtime the nexus does not provide; the in-repo deliverable is the
+elicitation METHODOLOGY + structured summary artifact a human or host conversation
+drives, not a live elicitation agent.
+
+---
+
+## DR-11 — Parallel Evaluator-Optimizer Spec Mode with Bias-Hardened Judge
+
+**Decision:** Operationalize the named-but-unimplemented G3 TRANCE form as a bounded,
+read-only parallel mode that WRAPS the standard S→P→E→C→T→R→A cycle:
+GENERATE (2-4 perspective-diverse clean-context candidate specs, default 3, cap 4) →
+EVALUATE (7-dimension rubric with explicit judge-bias mitigation: authoring-identity
+strip, presentation-order rotation, length normalization, deterministic-check anchor) →
+JUDGE-MERGE (one synthesized spec, per-dimension `[DECISION]` provenance, rejected
+rationale carried forward) → TERMINATE (confidence ≥85% OR hard cap 3 iterations, else
+`[GAP]` escalation). TRANCE-gated; never the default.
+
+**Why:** The G3 evaluator-optimizer form is named in the nexus trance-matrix but had
+zero operationalization in the repo — the Explore phase generates hypotheses
+sequentially in a single context and Refine is a single-context Reflexion loop, so
+there was no parallel candidate-spec generation, no clean-context fan-out, and no
+defined judge-merge or evaluator-bias mitigation. The evaluator step is exactly the
+LLM-as-judge surface that inherits position / verbosity / self-preference bias, so it
+must be bias-hardened, not assumed neutral.
+
+**Rejected alternatives:**
+- *Naive N-identical sampling* — rejected: quality dominates diversity-for-its-own-sake,
+  so cap at 3-4 high-quality perspective-diverse branches rather than maximize N (R3-06).
+- *Unbounded multi-agent debate* — rejected: debate needs deliberate tuning and a hard
+  termination bound, not free-running iteration (R3-04, D5).
+- *In-context sequential generation* — rejected: branches sharing one context
+  self-condition on each other's trajectory; clean-context subagents are required to
+  preserve genuine diversity (R1-03).
+
+**Evidence:** R3-04 (deliberate perspective-diversity, not naive MAD); R3-06 (quality
+dominates diversity — cap branches); R3-09 (LLM-as-judge position / verbosity /
+self-preference bias → identity-strip + order-rotate + length-normalize +
+deterministic-anchor); R1-03 (clean-context subagents prevent self-conditioning);
+R1-01 (read-only ⇒ safe parallel, no worktree isolation); cost-ceiling C1 (≤5 branches,
+capped 4); D5 + trance-matrix R4 (hard cap 3 iterations + explicit escalation).
+
+**Scope note:** The bias mitigations and branch/iteration caps are interpreted by the
+host LLM, not mechanically enforced — mechanical orchestration enforcement is a
+nexus-level concern outside this repo. The in-repo win is making the mitigations
+EXPLICIT and auditable in the spec output.
+
+---
+
+*SPECTRA v4.7.0 — CC BY-SA 4.0*

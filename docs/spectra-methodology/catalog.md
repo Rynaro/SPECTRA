@@ -286,4 +286,4 @@ Generated once during SPECTRA installation (see [RETROFIT.md](../research/RETROF
 
 ---
 
-*SPECTRA v4.2.0 — Output Templates*
+*SPECTRA v4.7.0 — Output Templates*

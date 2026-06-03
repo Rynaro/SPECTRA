@@ -219,4 +219,4 @@ See [THEORY.md](../research/THEORY.md#6-failure-taxonomy-for-plan-diagnostics) f
 
 ---
 
-*SPECTRA v4.2.0 — Scoring & Validation*
+*SPECTRA v4.7.0 — Scoring & Validation*

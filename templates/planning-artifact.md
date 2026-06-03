@@ -1,6 +1,6 @@
 ---
 artifact: planning-artifact
-version: 4.2.0
+version: 4.7.0
 ---
 
 # Planning Artifact — SPECTRA Output Template
@@ -66,4 +66,4 @@ When `ECL_VERSION` is present in the install root, every Assemble output include
 
 ---
 
-*SPECTRA v4.3.0*
+*SPECTRA v4.7.0*

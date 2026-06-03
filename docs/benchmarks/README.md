@@ -116,4 +116,4 @@ For the complete evaluation framework design, scoring rubrics, and statistical m
 
 ---
 
-*SPECTRA v4.2.0 — Benchmarks*
+*SPECTRA v4.7.0 — Benchmarks*
