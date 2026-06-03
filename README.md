@@ -309,4 +309,4 @@ SPECTRA v4 synthesizes insights from Plan-and-Solve Prompting (Wang et al.), Pla
 
 ---
 
-*SPECTRA v4.2.0 — Strategic Specification through Deliberate Reasoning*
+*SPECTRA v4.7.0 — Strategic Specification through Deliberate Reasoning*

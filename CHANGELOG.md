@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [4.7.0] — 2026-06-03 — DISCOVER phase + Parallel Spec Mode (TRANCE G3)
 
 ### Added
 - **DISCOVER phase (pre-CLARIFY, open-ended elicitation)** — new flat skill
@@ -35,8 +35,10 @@
 ### Notes
 - `EIIS_VERSION` (1.4) and `ECL_VERSION` (2.0) unchanged — both levers are
   additive methodology; no install-contract or envelope-shape change.
-- `agent.md` untouched (well under the ≤1000-token P0 gate); both new skills load
-  on demand. `EIDOLON_VERSION` bump intent 4.6.0 → 4.7.0 (MINOR).
+- `agent.md` token budget unaffected (well under the ≤1000-token P0 gate); both
+  new skills load on demand. `EIDOLON_VERSION` bumped `4.6.0` → `4.7.0` (MINOR —
+  additive feature). Release-version footer/frontmatter stamps across the
+  methodology, host, template, skill, and research files normalized to `4.7.0`.
 
 ## [4.6.0] — 2026-06-02 — CRYSTALIUM memory pipeline
 

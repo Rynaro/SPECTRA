@@ -308,4 +308,4 @@ For SPECTRA-specific research foundations (planning papers, commercial tool anal
 
 ---
 
-*SPECTRA v4.2.0 — Theoretical Foundations*
+*SPECTRA v4.7.0 — Theoretical Foundations*
