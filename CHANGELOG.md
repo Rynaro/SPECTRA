@@ -1,5 +1,23 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **Blocking symmetric verify-incoming gate (ECL §6.2.2)** — new flat skill
+  `skills/verify-incoming.md`. Receiver-side integrity gate that REFUSES to process
+  any inbound hand-off artefact whose SHA-256 has not been pre-verified by the
+  orchestrator (`eidolons verify-envelope --block`) and recorded as a `verify_pass`
+  trace event. Supersedes the earlier opt-in warn-only posture (which processed
+  tampered payloads anyway). Symmetric: all six Eidolons now ship this gate with
+  identical semantics; only the inbound-edge table is SPECTRA-specific (atlas, vigil,
+  forge as allowed senders). Receiver needs only `Read` — no Bash required.
+- **`tests/verify-incoming.bats`** — 17 bats tests validating the blocking posture,
+  negative no-warn-only assertion, install target write, and manifest recording.
+
+### Changed
+- `install.sh` manifest builder registers the new flat skill
+  (`_add_skill "verify-incoming"`) alongside `planning`, `discover`, `parallel-spec`.
+
 ## [4.7.0] — 2026-06-03 — DISCOVER phase + Parallel Spec Mode (TRANCE G3)
 
 ### Added
