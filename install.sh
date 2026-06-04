@@ -737,6 +737,7 @@ if [[ "$DRY_RUN" != "true" ]]; then
   _add_skill "planning"
   _add_skill "discover"
   _add_skill "parallel-spec"
+  _add_skill "verify-incoming"
   _skills_json="[${_sk%,}]"
 
   _installed_at=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || echo "1970-01-01T00:00:00Z")
