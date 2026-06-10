@@ -168,7 +168,7 @@ metadata:
   spec_id: "SPEC-YYYY-MM-DD-XXX"
   confidence: [N]
   complexity: [N]
-  spectra_version: "4.2.0"
+  spectra_version: "4.9.0"
 
 projects:
   - id: "P-1"
@@ -213,7 +213,7 @@ execution_plan:
   "session_id": "uuid",
   "spec_id": "SPEC-YYYY-MM-DD-XXX",
   "goal": "string",
-  "spectra_version": "4.2.0",
+  "spectra_version": "4.9.0",
   "steps": [
     {
       "id": 1,
@@ -286,4 +286,4 @@ Generated once during SPECTRA installation (see [RETROFIT.md](../research/RETROF
 
 ---
 
-*SPECTRA v4.2.0 — Output Templates*
+*SPECTRA — Output Templates*

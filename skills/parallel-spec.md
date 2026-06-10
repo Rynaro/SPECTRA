@@ -1,9 +1,9 @@
 ---
 name: spectra-parallel-spec
 description: "TRANCE-only G3 evaluator-optimizer mode: fan out 2-4 perspective-diverse clean-context candidate specs, score with a bias-hardened evaluator, judge-merge into ONE spec, terminate at confidence ≥85% or hard cap 3 iterations. Read-only; never the default — runs ONLY when the cortex authorizes TRANCE."
-methodology: SPECTRA
-methodology_version: "4.7"
-phase: TRANCE
+metadata:
+  methodology: SPECTRA
+  phase: TRANCE
 ---
 
 # SPECTRA — Parallel Spec Mode (G3 evaluator-optimizer)

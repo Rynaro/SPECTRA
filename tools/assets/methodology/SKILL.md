@@ -1,8 +1,8 @@
 ---
 name: spectra-planning
 description: "Decision-ready specifications via the SPECTRA cycle. Use for complex features (complexity ≥7/12), multi-component/service changes, ambiguous requirements needing structured decomposition, or any task where 'just start coding' would require significant rework. Produces a dual-format spec (Markdown + YAML/JSON), never code."
-methodology: SPECTRA
-methodology_version: "4.2"
+metadata:
+  methodology: SPECTRA
 ---
 
 # SPECTRA — Planning Skill
@@ -48,4 +48,4 @@ Load `.spectra/setup/spectra-conventions.md` if it exists. When present, its pro
 
 ---
 
-*SPECTRA v4.2.8*
+*SPECTRA — Planning Skill*

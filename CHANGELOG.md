@@ -1,6 +1,35 @@
 # Changelog
 
-## [Unreleased]
+## [4.9.0] — 2026-06-10 — Version-stamp hygiene + canonical skill template
+
+### Changed
+- Version-stamp sweep: `EIDOLON_VERSION` bumped `4.8.0` → `4.9.0` in `install.sh`.
+  `agent.md` and `AGENTS.md` frontmatter `version:` + `methodology_version:` updated
+  to `4.9.0`. README badge updated `v4.2` → `v4.9`.
+- Doc/template footers stripped of version strings (D1 policy): `DESIGN-RATIONALE.md`,
+  `INSTALL.md`, `docs/spectra-methodology/SPEC.md`, `docs/spectra-methodology/scoring.md`,
+  `docs/spectra-methodology/catalog.md`, `docs/spectra-methodology/SKILL.md`,
+  `docs/research/THEORY.md`, `docs/research/RETROFIT.md`, `docs/benchmarks/README.md`,
+  `evals/canary-missions.md`, `skills/planning.md`, `templates/planning-artifact.md`,
+  `tools/assets/methodology/SKILL.md`, `tools/assets/methodology/SPEC.md`,
+  `tools/assets/methodology/scoring.md`, `tools/assets/methodology/templates.md`.
+- `tools/lib/core.sh` `SPECTRA_VERSION` updated `4.2.8` → `4.9.0`.
+- `templates/spec.envelope.json` `from.version` updated `4.3.0` → `4.9.0`.
+- `examples/install.manifest.json` `version` updated `4.5.0` → `4.9.0`; added
+  missing `discover`, `parallel-spec`, and `verify-incoming` skill entries.
+- `docs/spectra-methodology/catalog.md` and `tools/assets/methodology/templates.md`
+  example `spectra_version` fields updated `4.2.0` → `4.9.0`.
+- `templates/planning-artifact.md` frontmatter `version` updated to `4.9.0`.
+- `docs/spectra-methodology/SKILL.md` metadata `version` updated to `4.9.0`.
+- Skill frontmatter normalized (D2): `methodology`/`phase` moved under `metadata:`;
+  `methodology_version` dropped from all four skills; `description` kept as single
+  physical line. `skills/verify-incoming.md` trace examples updated to use
+  `spectra@<version>` placeholder.
+- `tests/verify-incoming.bats` test re-targeted from `methodology_version` grep to
+  `name:`/`description:` presence + `metadata.methodology SPECTRA` assertion.
+- `CLAUDE.md` version reference updated.
+
+## [4.8.0] — 2026-06-04 — Blocking symmetric verify-incoming gate
 
 ### Added
 - **Blocking symmetric verify-incoming gate (ECL §6.2.2)** — new flat skill

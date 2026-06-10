@@ -458,4 +458,4 @@ The file lives at `.spectra/setup/spectra-conventions.md` and nowhere else — i
 
 ---
 
-*SPECTRA v4.7.0 — Strategic Specification through Deliberate Reasoning*
+*SPECTRA — Strategic Specification through Deliberate Reasoning*

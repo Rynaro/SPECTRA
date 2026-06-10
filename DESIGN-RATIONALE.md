@@ -239,4 +239,4 @@ EXPLICIT and auditable in the spec output.
 
 ---
 
-*SPECTRA v4.7.0 — CC BY-SA 4.0*
+*SPECTRA — CC BY-SA 4.0*
