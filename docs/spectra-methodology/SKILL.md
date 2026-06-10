@@ -2,7 +2,7 @@
 name: spectra-methodology
 description: "SPECTRA v4 — vendor-agnostic specification and planning methodology for AI agents."
 metadata:
-  version: 4.9.0
+  version: 4.9.1
 ---
 
 # SPECTRA Methodology — Quick Reference

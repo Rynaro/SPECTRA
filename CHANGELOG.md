@@ -1,5 +1,21 @@
 # Changelog
 
+## [4.9.1] — 2026-06-10 — Explicit tool allowlist in .claude/agents dispatch file
+
+### Fixed
+- **`.claude/agents/spectra.md` heredoc now ships an explicit `tools:` allowlist**
+  in the frontmatter. Without it, Claude Code's subagent inherits all tools and
+  the nexus MCP-wiring step (which appends `mcp__crystalium__*`) would silently
+  replace the inherit-all with an MCP-only set — starving SPECTRA of Read, Grep,
+  Glob, Write, and git/shasum Bash access. Added to `install.sh` heredoc after
+  `model: opus`:
+  `tools: Read, Grep, Glob, Write, Bash(git log:*), Bash(git show:*), Bash(git diff:*), Bash(shasum:*), Bash(wc:*)`
+  Rationale: SPECTRA is read-only toward the codebase but MUST Read scout
+  reports/code during Explore/fit-pass, Write its dual-format specs to `.spectra/`,
+  inspect git history, and compute ECL envelope SHA-256 (shasum/wc). The nexus
+  wiring appends `mcp__crystalium__*` globs on top of this allowlist; they are
+  intentionally excluded here to avoid locking in a specific MCP surface.
+
 ## [4.9.0] — 2026-06-10 — Version-stamp hygiene + canonical skill template
 
 ### Changed

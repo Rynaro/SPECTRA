@@ -11,7 +11,7 @@
 readonly _SPECTRA_CORE_LOADED=1
 
 # ─── Version ──────────────────────────────────────────────────────────────────
-readonly SPECTRA_VERSION="4.9.0"
+readonly SPECTRA_VERSION="4.9.1"
 readonly SPECTRA_REPO="https://github.com/Rynaro/SPECTRA"
 
 # ─── Colors (with fallback for non-interactive / no-color) ───────────────────

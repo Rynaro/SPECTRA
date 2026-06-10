@@ -1,6 +1,6 @@
 ---
 artifact: planning-artifact
-version: 4.9.0
+version: 4.9.1
 ---
 
 # Planning Artifact — SPECTRA Output Template
