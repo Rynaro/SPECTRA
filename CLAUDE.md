@@ -34,7 +34,7 @@ It outputs `spectra-project-profile.md` and `spectra-adaptation-prompt.md` in th
 - Architecture changes require research backing or significant case study data.
 - Every claim needs evidence ("This is better" needs a "because").
 - Keep core methodology vendor-agnostic — no specific model names.
-- Maintain version consistency across all methodology files (currently v4.9.0).
+- Maintain version consistency across all methodology files (currently v4.9.1).
 - Style: be precise, every word earns its place.
 
 ## Writing Conventions

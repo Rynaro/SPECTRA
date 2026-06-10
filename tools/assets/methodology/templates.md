@@ -168,7 +168,7 @@ metadata:
   spec_id: "SPEC-YYYY-MM-DD-XXX"
   confidence: [N]
   complexity: [N]
-  spectra_version: "4.9.0"
+  spectra_version: "4.9.1"
 
 projects:
   - id: "P-1"
@@ -213,7 +213,7 @@ execution_plan:
   "session_id": "uuid",
   "spec_id": "SPEC-YYYY-MM-DD-XXX",
   "goal": "string",
-  "spectra_version": "4.9.0",
+  "spectra_version": "4.9.1",
   "steps": [
     {
       "id": 1,

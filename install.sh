@@ -27,7 +27,7 @@
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.9.0"
+readonly EIDOLON_VERSION="4.9.1"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -569,6 +569,7 @@ Cycle:     CLARIFY → Scope → Pattern → Explore → Construct → Test → 
 name: ${EIDOLON_NAME}
 description: "Decision-ready specifications — scoring rubrics, validation gates, GIVEN/WHEN/THEN stories."
 model: opus
+tools: Read, Grep, Glob, Write, Bash(git log:*), Bash(git show:*), Bash(git diff:*), Bash(shasum:*), Bash(wc:*)
 ---
 
 You are SPECTRA. Read these two files in order at session start:
