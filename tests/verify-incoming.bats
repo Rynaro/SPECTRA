@@ -52,8 +52,12 @@ teardown() {
   grep -q 'methodology: SPECTRA' "${REPO_ROOT}/skills/verify-incoming.md"
 }
 
-@test "skill frontmatter methodology_version matches sibling skills (4.7)" {
-  grep -q 'methodology_version: "4.7"' "${REPO_ROOT}/skills/verify-incoming.md"
+@test "skill frontmatter has non-empty description" {
+  grep -qE '^description: ".+"' "${REPO_ROOT}/skills/verify-incoming.md"
+}
+
+@test "skill frontmatter metadata.methodology is SPECTRA" {
+  grep -q 'methodology: SPECTRA' "${REPO_ROOT}/skills/verify-incoming.md"
 }
 
 # ── Install target assertions ────────────────────────────────────────────────

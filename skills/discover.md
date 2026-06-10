@@ -1,8 +1,8 @@
 ---
 name: spectra-discover
 description: "Open-ended requirements & stakeholder/goal elicitation BEFORE CLARIFY. Use when the GOAL itself is underspecified (IDEA/STRATEGIC intent) — distinct from CLARIFY, which disambiguates an already-known goal. Read-only, bounded; produces an elicitation summary, never a plan."
-methodology: SPECTRA
-methodology_version: "4.7"
+metadata:
+  methodology: SPECTRA
 ---
 
 # SPECTRA — DISCOVER Skill (pre-CLARIFY elicitation)

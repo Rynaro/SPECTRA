@@ -190,4 +190,4 @@ All factual claims in this document with their verification status.
 
 ---
 
-*SPECTRA Retrofit Protocol v1.0 — for SPECTRA v4.7.0*
+*SPECTRA — Retrofit Protocol*

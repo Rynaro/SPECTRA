@@ -287,4 +287,4 @@ The agent asks ≤3 specific, numbered questions addressing at minimum:
 
 ---
 
-*SPECTRA v4.7.0 — run these missions after `bash install.sh` or `bash tools/spectra-init.sh`*
+*SPECTRA — run these missions after `bash install.sh` or `bash tools/spectra-init.sh`*

@@ -154,4 +154,4 @@ smoke missions covering greenfield, brownfield, and ambiguous-request scenarios.
 
 ---
 
-*SPECTRA v4.7.0 — CC BY-SA 4.0*
+*SPECTRA — CC BY-SA 4.0*

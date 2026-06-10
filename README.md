@@ -2,7 +2,7 @@
 
 **A vendor-agnostic planning methodology for AI agents that think before they code.**
 
-[![SPECTRA v4.2](https://img.shields.io/badge/methodology-SPECTRA_v4.2-6366f1)](docs/spectra-methodology/SPEC.md)
+[![SPECTRA v4.9](https://img.shields.io/badge/methodology-SPECTRA_v4.9-6366f1)](docs/spectra-methodology/SPEC.md)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/license-CC_BY--SA_4.0-green)](LICENSE)
 [![Research: 15+ papers](https://img.shields.io/badge/research-15%2B_papers-blue)](docs/research/REFERENCES.md)
 [![Benchmarks: Coming Soon](https://img.shields.io/badge/benchmarks-coming_soon-orange)](docs/benchmarks/README.md)
@@ -309,4 +309,4 @@ SPECTRA v4 synthesizes insights from Plan-and-Solve Prompting (Wang et al.), Pla
 
 ---
 
-*SPECTRA v4.7.0 — Strategic Specification through Deliberate Reasoning*
+*SPECTRA — Strategic Specification through Deliberate Reasoning*

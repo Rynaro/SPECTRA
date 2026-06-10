@@ -1,8 +1,8 @@
 ---
 name: spectra-planning
 description: "Decision-ready specifications via the SPECTRA cycle. Use for complex features (complexity ≥7/12), multi-component/service changes, ambiguous requirements needing structured decomposition, or any task where 'just start coding' would require significant rework. Produces a dual-format spec (Markdown + YAML/JSON), never code."
-methodology: SPECTRA
-methodology_version: "4.7"
+metadata:
+  methodology: SPECTRA
 ---
 
 # SPECTRA — Planning Skill
@@ -119,4 +119,4 @@ normally. Never hard-fail on absent CRYSTALIUM tools.
 
 ---
 
-*SPECTRA v4.7.0*
+*SPECTRA — Planning Skill*
