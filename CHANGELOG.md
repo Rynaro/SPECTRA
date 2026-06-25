@@ -1,5 +1,19 @@
 # Changelog
 
+## [4.10.0] — 2026-06-25 — ESL lifecycle-hop skill
+
+### Added
+- Add ESL lifecycle-hop skill (`esl-hop`) — SPECTRA's proposed/specify adoption
+  of the Eidolons Spec Lifecycle (opt-in). In an ESL-enabled project
+  (`mcp__tonberry__*` available) when the cortex routes a non-trivial change to
+  SPECTRA, SPECTRA owns the **proposed → specify** hop: `right_size` →
+  `propose` the change folder → run the S→P→E→C→T→R→A cycle and emit the spec
+  into it → `compose_manifest` → hand off to the implementer with an ECL
+  `PROPOSE` envelope. Graceful skip when tonberry is absent — produces the spec
+  normally; ESL is opt-in and SPECTRA remains EIIS-standalone-conformant.
+  `skills/esl-hop.md` wired across all host-vendor forms; `agent.md` skill-load
+  table references it. First per-Eidolon ESL adoption (canonical pattern).
+
 ## [4.9.1] — 2026-06-10 — Explicit tool allowlist in .claude/agents dispatch file
 
 ### Fixed
