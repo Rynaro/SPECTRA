@@ -137,8 +137,10 @@ Full scoring protocol in `docs/spectra-methodology/scoring.md`.
 
 ## DR-09 — ECL Emission Opt-In
 
-**Decision:** SPECTRA emits an ECL v1.0 envelope alongside the spec when
-`ECL_VERSION` is present in the install root. Emission is opt-in — absent
+**Decision:** SPECTRA emits an ECL v2.0 envelope alongside the spec when
+`ECL_VERSION` is present in the install root (v4.3.0 originally adopted ECL
+v1.0; v4.11.0 upgrades emission to v2.0 while retaining the v1 schema in-repo
+for the ECL §7.3 back-compat window). Emission is opt-in — absent
 `ECL_VERSION`, no envelope is produced and non-ECL consumers experience zero
 behaviour change.
 
@@ -146,17 +148,31 @@ behaviour change.
 edge in the Eidolons pipeline. Without a structured envelope, the receiving
 agent (APIVR-Δ) has no machine-readable provenance — it cannot verify that
 the payload was not tampered with between planning and execution (Agent-in-the-Middle
-class of attacks, ACL 2025). The ECL v1.0 sha256 integrity field (§6.2.2)
+class of attacks, ACL 2025). The ECL sha256 integrity field (§6.2.2)
 gates AiTM/prompt-infection at the message layer: APIVR-Δ can verify the hex
 digest before acting on the spec. Opt-in posture preserves backwards
 compatibility — installs without `ECL_VERSION` are fully functional, and the
 ATLAS v1.5.0 precedent confirms this model works at scale across the Eidolons
 roster.
 
-**Evidence:** ECL v1.0 §status-of-this-document (opt-in for v1.0); ECL §6.2.2
-(sha256 integrity gate); ACL 2025 Findings — Agent-in-the-Middle Attacks;
-ATLAS v1.5.0 (PR #24 on Rynaro/ATLAS) as canonical adoption pattern; published
-hand-off contract at `eidolons-ecl/contracts/spectra-to-apivr.yaml`.
+**ISE grade (ECL v2.0 §6.5) — why `self-attested`, not `validated` or
+`unverified`:** Assemble's confidence gate (§Assemble deliverables above) is
+real internal validation — SPECTRA does not ship a spec below the confidence
+threshold without cycling through Refine — which rules out `unverified`. But
+no other Eidolon or external gate re-checks the spec before the envelope is
+emitted (that re-check happens downstream, at APIVR-Δ / Kupo's own
+`verify-incoming` gate), which rules out `validated` (spec-mandated *external*
+gates) and `human-reviewed`. `self-attested` is the accurate middle grade: a
+spec is decision-ready, not externally verified. `ise.receiver_authorization`
+is `{auto_route: true, auto_merge: false, auto_deploy: false}` for the same
+reason — APIVR-Δ may pull a spec into its own intake automatically, but
+nothing downstream should merge or deploy on the strength of a plan alone.
+
+**Evidence:** ECL v2.0 §status-of-this-document (opt-in); ECL §6.2.2 (sha256
+integrity gate); ECL §6.5 (ISE trust hierarchy); ACL 2025 Findings —
+Agent-in-the-Middle Attacks; ATLAS v1.5.0 (PR #24 on Rynaro/ATLAS) as
+canonical adoption pattern; published hand-off contract at
+`eidolons-ecl/contracts/spectra-to-apivr.yaml`.
 
 ---
 
@@ -236,6 +252,61 @@ capped 4); D5 + trance-matrix R4 (hard cap 3 iterations + explicit escalation).
 host LLM, not mechanically enforced — mechanical orchestration enforcement is a
 nexus-level concern outside this repo. The in-repo win is making the mitigations
 EXPLICIT and auditable in the spec output.
+
+---
+
+## DR-12 — EARS Acceptance-Criteria Template (Frozen, Hashed Checks)
+
+**Decision:** Add `templates/acceptance-criteria.md`, an OPTIONAL, additive
+structured form for `acceptance_checks[]` items, carrying the closed EARS
+(Easy Approach to Requirements Syntax) grammar exactly as ESL 1.1 §2.5
+ratifies it: five fixed sentence forms (Ubiquitous, Event-driven,
+State-driven, Unwanted behavior, Optional feature), each mapped onto the
+`{id, given, when, then, verify_method}` shape ESL carries on
+`change.json`'s `acceptance_checks[]`. One criterion maps to exactly one
+mechanically checkable assertion. Criteria are frozen at Assemble exit: their
+SHA-256 rides the spec envelope as the `x_spectra_acceptance_criteria` vendor
+extension (ECL §1.2.3), so a downstream verifier can prove the checks it runs
+are the exact set frozen at spec time.
+
+**Why:** SPECTRA already had an informal `GIVEN [context] WHEN [action] THEN
+[outcome]` checklist convention (`docs/spectra-methodology/catalog.md` —
+Story Format), but nothing prevented two failure modes: (1) a criterion
+bundling two assertions behind one `AND`, which no single test or gate can
+verify atomically; (2) silent post-hoc editing of acceptance criteria after
+`in_progress` work has begun, which defeats ESL §6.4's `drift_check`
+re-derivation requirement (a checker re-deriving criteria against a document
+that was quietly rewritten cannot tell whether the implementation drifted or
+the spec did). Formalizing the grammar and freezing+hashing it at spec time
+closes both gaps without SPECTRA re-declaring ESL's own manifest schema —
+the field names are referenced by version (ESL 1.1 §2.5), not redefined.
+SPECTRA is EIIS's planning specialist and the natural owner of
+`acceptance_checks[]` content (ESL §2.4: "ESL MUST NOT re-define SPECTRA's
+GIVEN/WHEN/THEN format"), so shipping the first EARS template is a
+methodology-appropriate, additive extension rather than scope creep.
+
+**Why additive, never a gate:** ESL's C7 lint (`conformance/esl-conformance.sh`,
+SHOULD-level) only fires on items that already declare `given`/`when`/`then` —
+the plain-string and minimal `{id, verify_method}` forms produce no finding
+at all. A spec that never touches this template remains 100% conformant.
+
+**Rejected alternatives:**
+- *Mandating the EARS form for every criterion* — rejected: ESL 1.1 §2.5 is
+  explicit that the EARS fields are "advisory polish, NOT a gate"; SPECTRA
+  cannot tighten a SHOULD into a MUST unilaterally without breaking ESL
+  conformance for every consumer that hasn't adopted the template.
+- *Hashing the whole spec.md instead of a dedicated acceptance-criteria
+  file/section* — rejected: `artifact.sha256` already covers the whole spec;
+  a criteria-specific hash lets a verifier confirm the checks alone are
+  unchanged even when prose elsewhere in the spec is legitimately revised
+  (e.g. a Refine cycle that only touches the Approach section).
+
+**Evidence:** ESL 1.1 §2.5 (ratified EARS form + advisory-only C7 lint); ESL
+1.1 §2.4 (ESL MUST NOT re-declare SPECTRA's GIVEN/WHEN/THEN format); ESL 1.1
+§6.4 (`drift_check` re-derivation requirement); ESL 1.1 §8.2 check (7) (C7
+lint mechanics); ECL v2.0 §1.2.3 (`x_*` vendor-extension fields, receivers
+ignore unknown ones safely); DR-09 (ISE grade rationale, same
+decision-ready-not-externally-verified posture).
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 artifact: planning-artifact
-version: 4.9.1
+version: 4.11.0
 ---
 
 # Planning Artifact — SPECTRA Output Template
@@ -37,11 +37,11 @@ When `ECL_VERSION` is present in the install root, every Assemble output include
 
 **File location:** `<payload>.envelope.json` — sibling of the Markdown spec at `.spectra/plans/{date}-{feature}.envelope.json`.
 
-**Required fields (per ECL v1.0 §1.1):**
+**Required fields (per ECL v2.0 §1.1):**
 
 | Field | Value |
 |-------|-------|
-| `envelope_version` | `"1.0"` |
+| `envelope_version` | `"2.0"` |
 | `message_id` | UUIDv7 (unique per emission) |
 | `thread_id` | UUIDv7 (same for all envelopes in a mission) |
 | `parent_id` | `null` (SPECTRA is the thread initiator on this edge) |
@@ -58,11 +58,15 @@ When `ECL_VERSION` is present in the install root, every Assemble output include
 | `trace.model` | Model identifier (e.g. `claude-sonnet-4-6`) |
 | `trace.tier` | `"standard"` (or `"trance"` for TRANCE-tier sessions) |
 
+**Optional ISE block (ECL v2.0 §6.5):** `ise.assertion_grade` is `"self-attested"` — a spec is decision-ready, not externally verified (see `DESIGN-RATIONALE.md` DR-09). `ise.receiver_authorization` is `{auto_route: true, auto_merge: false, auto_deploy: false}`. `ise.provenance.methodology_version` is `"spectra-<installed-version>"`.
+
+**Optional acceptance-criteria hash:** when a spec emits EARS-form acceptance criteria (`templates/acceptance-criteria.md`), carry the frozen SHA-256 of that content as the `x_spectra_acceptance_criteria` vendor extension (`{path, sha256}`) so a downstream verifier can prove the checks it runs are the exact set frozen at spec time. Omit this field for specs using only the plain-string/minimal acceptance-check form.
+
 **sha256 anchor:** The integrity check is the hex digest of the Markdown file bytes at the moment of emission. APIVR-Δ verifies this before acting on the spec: `shasum -a 256 <payload>.md | awk '{print $1}'` MUST match `integrity.value`.
 
 **When emitted:** Only when `ECL_VERSION` is present in the install root. Non-ECL consumers ignore the file entirely.
 
-**Template:** Use `templates/spec.envelope.json` as the skeleton — fill every `<placeholder>` before emitting. Validate against `schemas/ecl-envelope.v1.json` before handing off.
+**Template:** Use `templates/spec.envelope.json` as the skeleton — fill every `<placeholder>` before emitting. Validate against `schemas/ecl-envelope.v2.json` before handing off (`schemas/ecl-envelope.v1.json` is retained for the ECL §7.3 back-compat window).
 
 ---
 

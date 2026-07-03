@@ -1,8 +1,8 @@
 ---
 name: spectra
-version: 4.10.0
+version: 4.11.0
 methodology: SPECTRA
-methodology_version: 4.10.0
+methodology_version: 4.11.0
 comm.envelope_version: "2.0"
 role: planning-specialist — transforms ambiguous intent into executable specifications
 ---
@@ -80,4 +80,5 @@ At the start of every session, check for `.spectra/setup/spectra-conventions.md`
 | Output formats per phase | `templates/catalog.md` |
 | Quick routing card | `skills/planning.md` |
 | ESL lifecycle hop (opt-in) | `skills/esl-hop.md` |
+| EARS acceptance criteria (optional) | `templates/acceptance-criteria.md` |
 | Project vocabulary (if fitted) | `.spectra/setup/spectra-conventions.md` (in consumer project root, not this Eidolon target) |

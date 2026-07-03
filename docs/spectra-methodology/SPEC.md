@@ -1,5 +1,7 @@
 # SPECTRA: Strategic Specification through Deliberate Reasoning
 
+> **Eidolon release:** v4.11.0 (see `CHANGELOG.md`) · **ECL:** v2.0 · **EIIS:** v1.4
+
 A cognitive architecture for AI agents that plan. Transforms ambiguous intent into executable specifications through structured reasoning cycles.
 
 SPECTRA produces plans — never code. Output is always dual-format: human-readable Markdown + agent-executable structured data (YAML/JSON).
@@ -399,22 +401,24 @@ SPECTRA's design decisions are grounded in decision theory, information theory, 
 
 ## ECL Compatibility
 
-SPECTRA v4.3.0 adopts **ECL v1.0** (Eidolons Communication Layer) for envelope emission on the `spectra → apivr` hand-off edge.
+SPECTRA v4.11.0 adopts **ECL v2.0** (Eidolons Communication Layer) for envelope emission on the `spectra → apivr` hand-off edge (SPECTRA v4.3.0 originally adopted ECL v1.0; the schema and prose below now target v2.0).
 
 **Posture:** Opt-in. Envelope emission occurs only when `ECL_VERSION` is present in the install root. Non-ECL consumers (pre-v4.3.0 installs or any consumer that has not installed ECL infrastructure) experience zero behaviour change — the `*.envelope.json` sidecar is ignored.
 
-**ECL invariant:** SPECTRA's emitted spec MUST be wrapped by an ECL v1.0 envelope when an `ECL_VERSION` file is present in the install root. The envelope is a sidecar JSON file named `<payload>.envelope.json`, co-located with the Markdown spec, carrying identity, addressing, sha256 integrity, and trace metadata for every artefact handed off on the `spectra → apivr` edge.
+**ECL invariant:** SPECTRA's emitted spec MUST be wrapped by an ECL v2.0 envelope when an `ECL_VERSION` file is present in the install root. The envelope is a sidecar JSON file named `<payload>.envelope.json`, co-located with the Markdown spec, carrying identity, addressing, sha256 integrity, trace metadata, and an optional ISE (Intent, Source, Entitlement) trust-hierarchy block for every artefact handed off on the `spectra → apivr` edge.
 
 | Item | Value |
 |------|-------|
-| ECL version | `1.0` |
+| ECL version | `2.0` |
 | Per-Eidolon profile schema | `schemas/spec-profile.v1.json` |
-| Envelope schema | `schemas/ecl-envelope.v1.json` |
+| Envelope schema | `schemas/ecl-envelope.v2.json` (`schemas/ecl-envelope.v1.json` RETAINED for the ECL §7.3 back-compat window, through 2027-05-13) |
 | Envelope template | `schemas/spec.envelope.json` |
 | Hand-off contract | `eidolons-ecl/contracts/spectra-to-apivr.yaml` |
 | Required spec sections (per contract) | `stories`, `validation_gates`, `agent_hints`, `given_when_then` |
 | Default `trust_level` | `standard` |
 | Token budget max | 6000 |
+| `ise.assertion_grade` (ECL v2.0 §6.5) | `self-attested` — a spec is decision-ready, not externally verified. See `DESIGN-RATIONALE.md` DR-09. |
+| Acceptance-criteria hash (optional) | `x_spectra_acceptance_criteria` vendor extension — see `templates/acceptance-criteria.md` |
 
 **Known follow-ups:** The `apivr → spectra-via-vigil` systemic-replan edge (the round-trip chain `spectra@PROPOSE → apivr@ACKNOWLEDGE → apivr@ESCALATE → vigil@INFORM → spectra@REQUEST(replan)`) has no published contract in `eidolons-ecl/contracts/` yet. Until that contract is added in a later PR, SPECTRA's envelope is one-directional on the primary edge only.
 
