@@ -27,7 +27,7 @@
 
 set -euo pipefail
 
-readonly EIDOLON_VERSION="4.10.0"
+readonly EIDOLON_VERSION="4.11.0"
 
 # Handle --version and --help before the bash version check so they
 # work cross-platform even on bash 3.x.
@@ -97,10 +97,15 @@ readonly SRC_SPEC="${SCRIPT_DIR}/docs/spectra-methodology/SPEC.md"
 readonly SRC_SCORING="${SCRIPT_DIR}/docs/spectra-methodology/scoring.md"
 readonly SRC_TEMPLATES="${SCRIPT_DIR}/docs/spectra-methodology/catalog.md"
 readonly SRC_PLANNING_ARTIFACT="${SCRIPT_DIR}/templates/planning-artifact.md"
+readonly SRC_ACCEPTANCE_CRITERIA="${SCRIPT_DIR}/templates/acceptance-criteria.md"
 readonly SRC_SKILLS_DIR="${SCRIPT_DIR}/skills"
 readonly SRC_ECL_VERSION="${SCRIPT_DIR}/ECL_VERSION"
 readonly SRC_SPEC_PROFILE="${SCRIPT_DIR}/schemas/spec-profile.v1.json"
+# ecl-envelope.v1.json is RETAINED alongside v2 (not replaced) so SPECTRA's own
+# tooling can still validate a v1.x sidecar received during the ECL §7.3
+# compatibility window (through 2027-05-13).
 readonly SRC_ECL_ENVELOPE="${SCRIPT_DIR}/schemas/ecl-envelope.v1.json"
+readonly SRC_ECL_ENVELOPE_V2="${SCRIPT_DIR}/schemas/ecl-envelope.v2.json"
 readonly SRC_SPEC_ENVELOPE_TMPL="${SCRIPT_DIR}/templates/spec.envelope.json"
 
 # Defaults
@@ -183,7 +188,7 @@ fi
 
 # --- Validate source files ---
 if [[ "$MANIFEST_ONLY" != "true" ]]; then
-  for _f in "$SRC_AGENT" "$SRC_SPEC" "$SRC_SCORING" "$SRC_TEMPLATES" "$SRC_PLANNING_ARTIFACT"; do
+  for _f in "$SRC_AGENT" "$SRC_SPEC" "$SRC_SCORING" "$SRC_TEMPLATES" "$SRC_PLANNING_ARTIFACT" "$SRC_ACCEPTANCE_CRITERIA"; do
     if [[ ! -f "$_f" ]]; then
       echo "Error: source file not found: ${_f}" >&2
       echo "Run this script from the SPECTRA repo root or a full clone." >&2
@@ -425,12 +430,16 @@ if [[ "$MANIFEST_ONLY" != "true" ]]; then
   copy_file "$SRC_SCORING"           "${TARGET}/templates/scoring.md"           "template"
   copy_file "$SRC_TEMPLATES"         "${TARGET}/templates/catalog.md"           "template"
   copy_file "$SRC_PLANNING_ARTIFACT" "${TARGET}/templates/planning-artifact.md" "template"
+  copy_file "$SRC_ACCEPTANCE_CRITERIA" "${TARGET}/templates/acceptance-criteria.md" "template"
 
-  # ECL v1.0 emission files (opt-in — only present when ECL_VERSION exists)
+  # ECL v2.0 emission files (opt-in — only present when ECL_VERSION exists).
+  # ecl-envelope.v1.json is RETAINED alongside v2 (not replaced) — see the
+  # SRC_ECL_ENVELOPE comment above for the §7.3 back-compat rationale.
   if [[ -f "$SRC_ECL_VERSION" ]]; then
     copy_file "$SRC_ECL_VERSION"          "${TARGET}/ECL_VERSION"                          "ecl-version"
     copy_file "$SRC_SPEC_PROFILE"         "${TARGET}/schemas/spec-profile.v1.json"         "other"
     copy_file "$SRC_ECL_ENVELOPE"         "${TARGET}/schemas/ecl-envelope.v1.json"         "other"
+    copy_file "$SRC_ECL_ENVELOPE_V2"      "${TARGET}/schemas/ecl-envelope.v2.json"         "other"
     # spec.envelope.json is a JSON template — moved to schemas/ (EIIS v1.4 §1.9.1:
     # templates/ allows only .md; schemas/ allows .json).
     copy_file "$SRC_SPEC_ENVELOPE_TMPL"   "${TARGET}/schemas/spec.envelope.json"           "other"
