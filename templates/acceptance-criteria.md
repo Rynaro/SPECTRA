@@ -12,7 +12,7 @@ checklist style (`docs/spectra-methodology/catalog.md` — Story Format), not a
 replacement for it: the plain-string and minimal `{id, verify_method}` acceptance-
 check forms remain 100% valid and produce **no** finding from ESL's advisory C7
 lint. Use this template when a consumer project has adopted ESL
-(`skills/esl-hop.md`) and a spec's stories benefit from a mechanically checkable,
+(`skills/esl-hop/SKILL.md`) and a spec's stories benefit from a mechanically checkable,
 closed grammar.
 
 ## The closed EARS grammar (five fixed sentence forms)
@@ -61,7 +61,7 @@ extension (ECL §1.2.3 — receivers unaware of it ignore it safely):
 A downstream verifier (Kupo at `verified`, or ESL's `drift_check` transition at
 `archived`) can recompute this digest and prove the checks it ran are the exact
 set frozen at spec time — not a set silently edited after the fact. See
-`templates/spec.envelope.json` and `skills/planning.md` "Acceptance criteria".
+`templates/spec.envelope.json` and `skills/planning/SKILL.md` "Acceptance criteria".
 
 ## Worked examples
 

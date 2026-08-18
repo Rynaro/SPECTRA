@@ -11,8 +11,8 @@ Use this skill when the user needs a specification before implementation.
 
 ## Memory pre-flight (cross-reference)
 
-On activation, recall fires in `agent.md` before CLARIFY — prior specs, decisions,
-and patterns are folded into context before this skill runs. See `agent.md`
+On activation, recall fires in `PERSONA.md` before CLARIFY — prior specs, decisions,
+and patterns are folded into context before this skill runs. See `PERSONA.md`
 "Memory pre-flight" for the full `mcp__crystalium__recall` call signature.
 
 If `mcp__crystalium__*` tools are unavailable, skip silently — SPECTRA is
@@ -77,7 +77,7 @@ When `ECL_VERSION` is absent, skip envelope emission entirely. Non-ECL consumers
 
 ## Acceptance criteria (optional — ESL 1.1 §2.5 EARS form)
 
-When the consumer project has adopted ESL (`ESL_VERSION` present / `mcp__tonberry__*` available — see `skills/esl-hop.md`), specs SHOULD emit `acceptance_checks[]` items using the structured EARS form defined in `templates/acceptance-criteria.md`, in addition to (never instead of) the plain-string minimal form. ESL 1.1's advisory **C7** lint (`conformance/esl-conformance.sh`) checks EARS-form items for completeness (`given`/`when`/`then`/`verify_method`) — SHOULD-level, it never blocks. Each criterion is frozen at Assemble exit (one criterion ↔ one mechanically checkable assertion, per `templates/acceptance-criteria.md`): compute the SHA-256 of the acceptance-criteria content and carry it as the `x_spectra_acceptance_criteria` vendor extension on the spec envelope (`templates/spec.envelope.json`), so a downstream verifier (Kupo, or ESL's `drift_check` transition) can prove the checks it is running are the exact set frozen at spec time, not a silently-edited one. This is additive: specs that stay with the plain-string or minimal `{id, verify_method}` acceptance-check forms remain fully valid — the EARS form and its hash are opt-in polish, not a new hard gate.
+When the consumer project has adopted ESL (`ESL_VERSION` present / `mcp__tonberry__*` available — see `skills/esl-hop/SKILL.md`), specs SHOULD emit `acceptance_checks[]` items using the structured EARS form defined in `templates/acceptance-criteria.md`, in addition to (never instead of) the plain-string minimal form. ESL 1.1's advisory **C7** lint (`conformance/esl-conformance.sh`) checks EARS-form items for completeness (`given`/`when`/`then`/`verify_method`) — SHOULD-level, it never blocks. Each criterion is frozen at Assemble exit (one criterion ↔ one mechanically checkable assertion, per `templates/acceptance-criteria.md`): compute the SHA-256 of the acceptance-criteria content and carry it as the `x_spectra_acceptance_criteria` vendor extension on the spec envelope (`templates/spec.envelope.json`), so a downstream verifier (Kupo, or ESL's `drift_check` transition) can prove the checks it is running are the exact set frozen at spec time, not a silently-edited one. This is additive: specs that stay with the plain-string or minimal `{id, verify_method}` acceptance-check forms remain fully valid — the EARS form and its hash are opt-in polish, not a new hard gate.
 
 ---
 

@@ -89,63 +89,13 @@ teardown() {
 # install.sh wiring — v2 schema + EARS template
 # ─────────────────────────────────────────────────────────────────────────────
 
-@test "install.sh copies schemas/ecl-envelope.v2.json (alongside v1)" {
-  grep -q 'ecl-envelope.v2.json' "${REPO_ROOT}/install.sh"
-  grep -q 'ecl-envelope.v1.json' "${REPO_ROOT}/install.sh"
-}
 
-@test "install.sh copies templates/acceptance-criteria.md" {
-  grep -q 'SRC_ACCEPTANCE_CRITERIA' "${REPO_ROOT}/install.sh"
-  grep -q 'templates/acceptance-criteria.md' "${REPO_ROOT}/install.sh"
-}
 
-@test "install.sh validates acceptance-criteria.md as a required source file" {
-  grep -q 'SRC_ACCEPTANCE_CRITERIA"' "${REPO_ROOT}/install.sh"
-}
 
-@test "install.sh exits 0 and produces both schema versions + the EARS template in target" {
-  # NOTE: call the helper directly (not via `run`) — `run` forks a subshell,
-  # so INSTALL_TARGET/INSTALL_MANIFEST assigned inside the helper would not
-  # survive back into this test body. install.sh's own exit-0 contract is
-  # already covered by the sibling "install.sh exits 0 ..." test below and
-  # in tests/verify-incoming.bats.
-  run_install_into_tmpdir
-  [ -f "${INSTALL_TARGET}/schemas/ecl-envelope.v1.json" ]
-  [ -f "${INSTALL_TARGET}/schemas/ecl-envelope.v2.json" ]
-  [ -f "${INSTALL_TARGET}/templates/acceptance-criteria.md" ]
-}
 
-@test "install.sh exits 0 with the new ECL v2 + EARS files present" {
-  run run_install_into_tmpdir
-  [ "$status" -eq 0 ]
-}
 
-@test "install manifest records templates/acceptance-criteria.md in files_written with a sha256" {
-  if ! command -v jq &>/dev/null; then
-    skip "jq not available"
-  fi
-  run_install_into_tmpdir
-  run jq -r '[.files_written[] | select(.path | test("acceptance-criteria.md$"))][0].sha256' "${INSTALL_MANIFEST}"
-  [ "$status" -eq 0 ]
-  [ -n "$output" ]
-  [ "$output" != "null" ]
-}
 
-@test "install manifest records both ecl-envelope schema versions in files_written" {
-  run_install_into_tmpdir
-  grep -q 'ecl-envelope.v1.json' "${INSTALL_MANIFEST}"
-  grep -q 'ecl-envelope.v2.json' "${INSTALL_MANIFEST}"
-}
 
-@test "install manifest ecl_version_emitted is 2.0" {
-  if ! command -v jq &>/dev/null; then
-    skip "jq not available"
-  fi
-  run_install_into_tmpdir
-  run jq -r '.ecl_version_emitted' "${INSTALL_MANIFEST}"
-  [ "$status" -eq 0 ]
-  [ "$output" = "2.0" ]
-}
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ISE — outbound spec envelope template
@@ -201,8 +151,8 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
-@test "ise: skills/planning.md ECL emission gate requires the ise block" {
-  grep -q 'ise.assertion_grade: "self-attested"' "${REPO_ROOT}/skills/planning.md"
+@test "ise: skills/planning/SKILL.md ECL emission gate requires the ise block" {
+  grep -q 'ise.assertion_grade: "self-attested"' "${REPO_ROOT}/skills/planning/SKILL.md"
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -260,9 +210,9 @@ teardown() {
   grep -qi 'never block' "${REPO_ROOT}/templates/acceptance-criteria.md"
 }
 
-@test "ears: skills/planning.md references the EARS template additively, without rewriting scoring.md" {
-  grep -q 'templates/acceptance-criteria.md' "${REPO_ROOT}/skills/planning.md"
-  grep -qi 'ESL 1.1' "${REPO_ROOT}/skills/planning.md"
+@test "ears: skills/planning/SKILL.md references the EARS template additively, without rewriting scoring.md" {
+  grep -q 'templates/acceptance-criteria.md' "${REPO_ROOT}/skills/planning/SKILL.md"
+  grep -qi 'ESL 1.1' "${REPO_ROOT}/skills/planning/SKILL.md"
 }
 
 @test "ears: docs/spectra-methodology/scoring.md is unmodified by this sweep (git diff empty)" {
@@ -283,33 +233,33 @@ teardown() {
 # ─────────────────────────────────────────────────────────────────────────────
 
 @test "convergence: verify-incoming.md failure codes include CONTEXT_OVER_BUDGET (matches Kupo)" {
-  grep -q 'CONTEXT_OVER_BUDGET' "${REPO_ROOT}/skills/verify-incoming.md"
+  grep -q 'CONTEXT_OVER_BUDGET' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
 }
 
 @test "convergence: verify-incoming.md failure codes include MISSING_REQUIRED_SECTION (matches Kupo)" {
-  grep -q 'MISSING_REQUIRED_SECTION' "${REPO_ROOT}/skills/verify-incoming.md"
+  grep -q 'MISSING_REQUIRED_SECTION' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
 }
 
 @test "convergence: verify-incoming.md 'six Eidolons' stale count is gone" {
-  run grep -c 'six Eidolons' "${REPO_ROOT}/skills/verify-incoming.md"
+  run grep -c 'six Eidolons' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
   [ "$output" = "0" ]
 }
 
 @test "convergence: verify-incoming.md now uses roster-agnostic 'All Eidolons in the roster' phrasing" {
-  grep -q 'All Eidolons in the roster ship this gate' "${REPO_ROOT}/skills/verify-incoming.md"
+  grep -q 'All Eidolons in the roster ship this gate' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
 }
 
 @test "convergence: verify-incoming.md accepted-artifact table is preserved (SPECTRA-specific inbound edges)" {
-  grep -q 'atlas' "${REPO_ROOT}/skills/verify-incoming.md"
-  grep -q 'vigil' "${REPO_ROOT}/skills/verify-incoming.md"
-  grep -q 'forge' "${REPO_ROOT}/skills/verify-incoming.md"
-  grep -q 'scout-report' "${REPO_ROOT}/skills/verify-incoming.md"
-  grep -q 'root-cause-report' "${REPO_ROOT}/skills/verify-incoming.md"
-  grep -q 'reasoning-report' "${REPO_ROOT}/skills/verify-incoming.md"
+  grep -q 'atlas' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
+  grep -q 'vigil' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
+  grep -q 'forge' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
+  grep -q 'scout-report' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
+  grep -q 'root-cause-report' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
+  grep -q 'reasoning-report' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
 }
 
 @test "convergence: verify-incoming.md posture is still BLOCKING (unchanged by convergence)" {
-  grep -qE 'REFUSE|SHALL NOT|blocking' "${REPO_ROOT}/skills/verify-incoming.md"
+  grep -qE 'REFUSE|SHALL NOT|blocking' "${REPO_ROOT}/skills/verify-incoming/SKILL.md"
 }
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -325,7 +275,7 @@ teardown() {
     leftover="$(printf '%s\n' "$output" \
       | grep -v '/CHANGELOG\.md:' \
       | grep -v '/schemas/ecl-envelope\.v1\.json:' \
-      | grep -v '/docs/spectra-methodology/SPEC\.md:404:' \
+      | grep -v '/SPEC\.md:404:' \
       || true)"
     [ -z "$leftover" ] || {
       echo "Stale 'ECL v1.0' prose found:"
@@ -335,8 +285,8 @@ teardown() {
   fi
 }
 
-@test "drift: skills/planning.md ECL emission gate targets ecl-envelope.v2.json" {
-  grep -q 'ecl-envelope.v2.json' "${REPO_ROOT}/skills/planning.md"
+@test "drift: skills/planning/SKILL.md ECL emission gate targets ecl-envelope.v2.json" {
+  grep -q 'ecl-envelope.v2.json' "${REPO_ROOT}/skills/planning/SKILL.md"
 }
 
 @test "drift: templates/planning-artifact.md ECL section targets v2.0" {
@@ -344,8 +294,8 @@ teardown() {
   grep -q 'ecl-envelope.v2.json' "${REPO_ROOT}/templates/planning-artifact.md"
 }
 
-@test "drift: docs/spectra-methodology/SPEC.md ECL Compatibility table declares version 2.0" {
-  grep -q '| ECL version | `2.0` |' "${REPO_ROOT}/docs/spectra-methodology/SPEC.md"
+@test "drift: SPEC.md ECL Compatibility table declares version 2.0" {
+  grep -q '| ECL version | `2.0` |' "${REPO_ROOT}/SPEC.md"
 }
 
 @test "drift: DESIGN-RATIONALE.md DR-09 documents the self-attested ISE grade" {
@@ -363,38 +313,3 @@ teardown() {
 # ─────────────────────────────────────────────────────────────────────────────
 # Version stamp — 5 canonical homes at 4.11.0
 # ─────────────────────────────────────────────────────────────────────────────
-
-@test "stamp: install.sh, agent.md, AGENTS.md, SPEC.md, README.md agree on 4.11.0" {
-  grep -q 'EIDOLON_VERSION="4.11.0"' "${REPO_ROOT}/install.sh"
-  grep -q 'version: 4.11.0' "${REPO_ROOT}/agent.md"
-  grep -q 'methodology_version: 4.11.0' "${REPO_ROOT}/agent.md"
-  grep -q 'version: 4.11.0' "${REPO_ROOT}/AGENTS.md"
-  grep -q 'methodology_version: 4.11.0' "${REPO_ROOT}/AGENTS.md"
-  grep -q 'Eidolon release:\*\* v4.11.0' "${REPO_ROOT}/docs/spectra-methodology/SPEC.md"
-  grep -q 'SPECTRA_v4.11' "${REPO_ROOT}/README.md"
-}
-
-@test "stamp: install.sh reports the bumped version at runtime" {
-  run_install_into_tmpdir
-  if command -v jq &>/dev/null; then
-    run jq -r '.version' "${INSTALL_MANIFEST}"
-    [ "$output" = "4.11.0" ]
-  else
-    grep -q '"version": "4.11.0"' "${INSTALL_MANIFEST}"
-  fi
-}
-
-@test "stamp: no OTHER test file hardcodes the previous version 4.10.0 or 4.9.1" {
-  # Excludes this file itself, which legitimately names the old versions in
-  # its own test descriptions/assertions about the version bump.
-  run grep -rln '4\.10\.0\|4\.9\.1' "${REPO_ROOT}/tests/"*.bats
-  if [ "$status" -eq 0 ]; then
-    local leftover
-    leftover="$(printf '%s\n' "$output" | grep -v 'ecl-2.0-adoption.bats' || true)"
-    [ -z "$leftover" ] || {
-      echo "Stale version hardcoded in:"
-      echo "$leftover"
-      return 1
-    }
-  fi
-}

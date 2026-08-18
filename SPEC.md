@@ -57,7 +57,7 @@ incompatible with this open-ended discovery — hence a distinct pre-phase.
 multi-turn interview loop. Produce ONE elicitation summary; if coverage is low (≥2 of
 5 axes are unresolved `[GAP]`s), **escalate to the human** rather than fabricate
 goals. DISCOVER NEVER produces a plan and NEVER writes code (D2) — it hands its
-summary to CLARIFY. See `skills/discover.md` and DESIGN-RATIONALE.md DR-10.
+summary to CLARIFY. See `skills/discover/SKILL.md` and DESIGN-RATIONALE.md DR-10.
 
 ---
 
@@ -267,7 +267,7 @@ isolation required** (distinct from APIVR-Δ's parallel-WRITE, which needs it).
 
 The merged spec flows through the normal Assemble gate and ECL envelope emission
 unchanged — downstream APIVR-Δ sees one spec + one envelope exactly as today, so the
-parallel mode is invisible at the hand-off boundary. See `skills/parallel-spec.md`
+parallel mode is invisible at the hand-off boundary. See `skills/parallel-spec/SKILL.md`
 and DESIGN-RATIONALE.md DR-11.
 
 ---

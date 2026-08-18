@@ -8,9 +8,9 @@
 - **EARS acceptance-criteria template (headline addition), additive only.** New `templates/acceptance-criteria.md` carries the closed EARS grammar exactly as ESL 1.1 §2.5 ratifies it — the five fixed sentence forms (Ubiquitous, Event-driven, State-driven, Unwanted behavior, Optional feature) mapped onto the `{id, given, when, then, verify_method}` shape ESL carries on `change.json`'s `acceptance_checks[]` — with 3 worked examples and the rule: one criterion ↔ one mechanically checkable assertion; criteria are frozen (hashed) at spec time. The acceptance file's SHA-256 rides the spec envelope as the new `x_spectra_acceptance_criteria` vendor extension (`{path, sha256}`, ECL §1.2.3) so a verifier can prove the frozen checks ran. `skills/planning.md` gains a short additive "Acceptance criteria" section (specs SHOULD emit this form; ESL 1.1's C7 lints it; never a hard gate — `docs/spectra-methodology/scoring.md` is unchanged). Wired into `install.sh` (required source file + unconditional `copy_file`, mirroring `planning-artifact.md`). New `DESIGN-RATIONALE.md` DR-12 documents the decision.
 
 ### Changed
-- **ECL prose drift kill (v1.0 → v2.0).** `docs/spectra-methodology/SPEC.md`'s ECL Compatibility section, `DESIGN-RATIONALE.md` DR-09, `templates/planning-artifact.md`'s ECL Envelope Sidecar section, `skills/planning.md`'s ECL emission gate, and `templates/spec.envelope.json` all reconciled to ECL v2.0 (schema path, `envelope_version: "2.0"`, ISE row). `docs/spectra-methodology/SPEC.md` gains a header stamp (`> **Eidolon release:** v4.11.0 · **ECL:** v2.0 · **EIIS:** v1.4`) — it previously carried no version marker near the title.
+- **ECL prose drift kill (v1.0 → v2.0).** `SPEC.md`'s ECL Compatibility section, `DESIGN-RATIONALE.md` DR-09, `templates/planning-artifact.md`'s ECL Envelope Sidecar section, `skills/planning.md`'s ECL emission gate, and `templates/spec.envelope.json` all reconciled to ECL v2.0 (schema path, `envelope_version: "2.0"`, ISE row). `SPEC.md` gains a header stamp (`> **Eidolon release:** v4.11.0 · **ECL:** v2.0 · **EIIS:** v1.4`) — it previously carried no version marker near the title.
 - **Canonical verify-incoming convergence with `../Kupo`.** `skills/verify-incoming.md` failure-code list gains `CONTEXT_OVER_BUDGET` and `MISSING_REQUIRED_SECTION` (Kupo already listed both). "All six Eidolons ship this gate" → "All Eidolons in the roster ship this gate" (Kupo's roster-size-agnostic phrasing; the "six" count was stale — the roster has grown to 8 Eidolons emitting ECL envelopes). SPECTRA's own accepted-artifact table (atlas/vigil/forge) and the "Posture change" callout are unchanged.
-- **Version stamp 4.10.0 → 4.11.0** in the 5 canonical homes: `install.sh` (`EIDOLON_VERSION`), `agent.md` + `AGENTS.md` frontmatter (`version` + `methodology_version` — this also fixes AGENTS.md, which had drifted to 4.9.1 since the 4.10.0 release), `docs/spectra-methodology/SPEC.md` header, and the README badge (`v4.9` → `v4.11`). Scattered pre-existing stale version strings outside these homes (`tools/lib/core.sh`, `docs/spectra-methodology/{SKILL,catalog}.md`, `tools/assets/methodology/*`, `CLAUDE.md` prose) are unchanged — out of scope per D1's no-footer-versions policy; a future stamp-hygiene pass should sweep them.
+- **Version stamp 4.10.0 → 4.11.0** in the 5 canonical homes: `install.sh` (`EIDOLON_VERSION`), `agent.md` + `AGENTS.md` frontmatter (`version` + `methodology_version` — this also fixes AGENTS.md, which had drifted to 4.9.1 since the 4.10.0 release), `SPEC.md` header, and the README badge (`v4.9` → `v4.11`). Scattered pre-existing stale version strings outside these homes (`tools/lib/core.sh`, `docs/spectra-methodology/{SKILL,catalog}.md`, `tools/assets/methodology/*`, `CLAUDE.md` prose) are unchanged — out of scope per D1's no-footer-versions policy; a future stamp-hygiene pass should sweep them.
 
 ### Tests
 - New `tests/ecl-2.0-adoption.bats`: v2 schema vendored + valid + retains v1, ISE block shape/values on `templates/spec.envelope.json` and the vendored schema's `$defs.ise`, install.sh wiring for both the v2 schema and the new EARS template (source + installed target + manifest), acceptance-criteria template content assertions (five forms, worked examples, frozen/hash rule), drift greps (no stale "ECL v1.0" prose outside historical/back-compat mentions and CHANGELOG.md), verify-incoming convergence (new failure codes, roster-agnostic wording, preserved table), and the 5-canonical-homes version-stamp check.
@@ -52,7 +52,7 @@
   `agent.md` and `AGENTS.md` frontmatter `version:` + `methodology_version:` updated
   to `4.9.0`. README badge updated `v4.2` → `v4.9`.
 - Doc/template footers stripped of version strings (D1 policy): `DESIGN-RATIONALE.md`,
-  `INSTALL.md`, `docs/spectra-methodology/SPEC.md`, `docs/spectra-methodology/scoring.md`,
+  `INSTALL.md`, `SPEC.md`, `docs/spectra-methodology/scoring.md`,
   `docs/spectra-methodology/catalog.md`, `docs/spectra-methodology/SKILL.md`,
   `docs/research/THEORY.md`, `docs/research/RETROFIT.md`, `docs/benchmarks/README.md`,
   `evals/canary-missions.md`, `skills/planning.md`, `templates/planning-artifact.md`,
@@ -166,7 +166,7 @@
 ## [4.5.1] — 2026-05-26 — SPEC.md text sweep
 
 ### Fixed
-- `docs/spectra-methodology/SPEC.md`: corrected stale envelope template path in
+- `SPEC.md`: corrected stale envelope template path in
   ECL Compatibility table — `templates/spec.envelope.json` → `schemas/spec.envelope.json`
   (file is installed to the consumer target's `schemas/` directory since v4.5.0;
   prose reference was not updated at that time).
@@ -221,13 +221,13 @@
 ## [4.4.0] — 2026-05-25 — EIIS v1.3 install normalization
 
 ### Changed
-- BREAKING: full-spec destination renamed `SPECTRA.md` → `SPEC.md` (EIIS v1.3 §1.8). Source file renamed `docs/spectra-methodology/SPECTRA.md` → `docs/spectra-methodology/SPEC.md`.
+- BREAKING: full-spec destination renamed `SPECTRA.md` → `SPEC.md` (EIIS v1.3 §1.8). Source file renamed `docs/spectra-methodology/SPECTRA.md` → `SPEC.md`.
 - BREAKING: skills layout flattened from `skills/<skill>/SKILL.md` (subdir) to `skills/<skill>.md` (flat, source-of-truth). Vendor copies at `.claude/skills/spectra-<skill>/SKILL.md` unchanged.
 - `install.sh`: `wire_skill` helper rewritten to EIIS v1.3 §4.2.4 dual-write contract (source-of-truth flat path + Claude Code vendor copy). Bash 3.2 compatible.
 - `EIDOLON_VERSION` bumped `4.3.2` → `4.4.0` (MINOR — breaking install-layout change).
 
 ### Removed
-- Out-of-sync duplicate `SPECTRA.md` at repo root deleted. Authoritative source is `docs/spectra-methodology/SPEC.md`.
+- Out-of-sync duplicate `SPECTRA.md` at repo root deleted. Authoritative source is `SPEC.md`.
 
 ### Compliance
 - `EIIS_VERSION` bumped `1.2` → `1.3`.
