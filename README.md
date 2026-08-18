@@ -2,7 +2,7 @@
 
 **A vendor-agnostic planning methodology for AI agents that think before they code.**
 
-[![SPECTRA v4.11](https://img.shields.io/badge/methodology-SPECTRA_v4.11-6366f1)](docs/spectra-methodology/SPEC.md)
+[![SPECTRA v4.11](https://img.shields.io/badge/methodology-SPECTRA_v4.11-6366f1)](SPEC.md)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/license-CC_BY--SA_4.0-green)](LICENSE)
 [![Research: 15+ papers](https://img.shields.io/badge/research-15%2B_papers-blue)](docs/research/REFERENCES.md)
 [![Benchmarks: Coming Soon](https://img.shields.io/badge/benchmarks-coming_soon-orange)](docs/benchmarks/README.md)
@@ -195,7 +195,7 @@ All modes also create:
 3. **Save output** — Copy the LLM's response into `.spectra/setup/spectra-conventions.md`
 4. **Start planning** — Use SPECTRA for your next feature. Invoke `@spectra-planner` (Agent mode) or reference the skill (Skill mode)
 
-For a detailed walkthrough of the SPECTRA planning cycle, see [SPEC.md](docs/spectra-methodology/SPEC.md).
+For a detailed walkthrough of the SPECTRA planning cycle, see [SPEC.md](SPEC.md).
 
 ---
 
@@ -203,7 +203,7 @@ For a detailed walkthrough of the SPECTRA planning cycle, see [SPEC.md](docs/spe
 
 | Start Here | Then | Deep Dives |
 |------------|------|------------|
-| [**SPEC.md**](docs/spectra-methodology/SPEC.md) | [scoring.md](docs/spectra-methodology/scoring.md) | [THEORY.md](docs/research/THEORY.md) |
+| [**SPEC.md**](SPEC.md) | [scoring.md](docs/spectra-methodology/scoring.md) | [THEORY.md](docs/research/THEORY.md) |
 | Full cognitive architecture | Rubrics, matrices, validation | Decision theory, information theory, cognitive science |
 
 ---
@@ -310,3 +310,17 @@ SPECTRA v4 synthesizes insights from Plan-and-Solve Prompting (Wang et al.), Pla
 ---
 
 *SPECTRA — Strategic Specification through Deliberate Reasoning*
+
+<!-- eiis-v3-package:start -->
+## EIIS v3 package
+
+This repository has the same self-contained package shape as every roster Eidolon:
+
+- `PERSONA.md` — bounded identity, triggers, authority, refusals, and handoffs.
+- `SPEC.md` — the authoritative methodology.
+- `skills/<methodology>/SKILL.md` — unique skill discovery entrypoints.
+- `manifest.json` — immutable package metadata and resource inventory.
+- `install.sh` — package-only installer; the nexus owns vendor adapters.
+
+See [INSTALL.md](INSTALL.md) for nexus and standalone installation.
+<!-- eiis-v3-package:end -->

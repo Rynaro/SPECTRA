@@ -62,7 +62,7 @@ constraint applies to the codebase, not to the memory substrate — calling
 installed), proceed without memory — never hard-fail. SPECTRA is EIIS-standalone-
 conformant and works without CRYSTALIUM.
 
-See `skills/planning.md` for the corresponding cross-reference at Assemble exit.
+See `skills/planning/SKILL.md` for the corresponding cross-reference at Assemble exit.
 See `SPEC.md §9` for the full memory protocol summary.
 
 ---
@@ -78,7 +78,7 @@ At the start of every session, check for `.spectra/setup/spectra-conventions.md`
 | Full cognitive architecture | `SPEC.md` (sibling of this file) |
 | Scoring rubrics + matrices | `templates/scoring.md` |
 | Output formats per phase | `templates/catalog.md` |
-| Quick routing card | `skills/planning.md` |
-| ESL lifecycle hop (opt-in) | `skills/esl-hop.md` |
+| Quick routing card | `skills/planning/SKILL.md` |
+| ESL lifecycle hop (opt-in) | `skills/esl-hop/SKILL.md` |
 | EARS acceptance criteria (optional) | `templates/acceptance-criteria.md` |
 | Project vocabulary (if fitted) | `.spectra/setup/spectra-conventions.md` (in consumer project root, not this Eidolon target) |

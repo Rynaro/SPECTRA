@@ -31,7 +31,7 @@ cortex `methodology/cortex/esl-protocol.md`.
    and `acceptance_checks` (ids referencing your GIVEN / WHEN / THEN) in
    `change.json`.
 5. **hand off** to the implementer (**Vivi** at `in_progress`) with your normal
-   ECL `PROPOSE` envelope (see `skills/planning.md` "ECL emission").
+   ECL `PROPOSE` envelope (see `skills/planning/SKILL.md` "ECL emission").
 
 ## Invariants
 
